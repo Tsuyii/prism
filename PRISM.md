@@ -177,6 +177,17 @@ create table schedule_config (
 
 **Subagent-driven development** — always use `superpowers:subagent-driven-development` when executing plans. One fresh subagent per task, review between tasks.
 
+**Push policy — push every task to master:**
+After each task passes spec + code quality review, merge the worktree branch into master and push. This ensures every task gets a GitHub contribution and triggers a Vercel deploy.
+
+```bash
+# After each task is approved (run from main repo root):
+git merge plan-1-foundation --ff-only
+git push origin master
+```
+
+Worktree: `~/.config/superpowers/worktrees/Prism/plan-1-foundation` (branch: `plan-1-foundation`)
+
 ---
 
 ## Implementation Plans
