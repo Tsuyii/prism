@@ -173,6 +173,24 @@ create table schedule_config (
 
 ---
 
+## Execution Method
+
+**Subagent-driven development** — always use `superpowers:subagent-driven-development` when executing plans. One fresh subagent per task, review between tasks.
+
+---
+
+## Implementation Plans
+
+| Plan | File | Status |
+|---|---|---|
+| Plan 1: Foundation | `docs/superpowers/plans/2026-04-16-plan-1-foundation.md` | Ready to execute |
+| Plan 2: Drive + AI Pipeline | TBD | Not written yet |
+| Plan 3: Review PWA | TBD | Not written yet |
+| Plan 4: n8n + Blotato | TBD | Not written yet |
+| Plan 5: Research + Metrics | TBD | Not written yet |
+
+---
+
 ## Completed Features
 
 _None yet — project initialized._
@@ -181,24 +199,17 @@ _None yet — project initialized._
 
 ## In Progress
 
-_Nothing started yet._
+_Plan 1: Foundation — ready to execute in a fresh session._
 
 ---
 
 ## Pending (build order)
 
-1. [ ] Supabase schema setup
-2. [ ] Next.js project scaffold + Vercel deploy
-3. [ ] Stitch screen designs (4 screens)
-4. [ ] Google Drive OAuth + folder watcher integration
-5. [ ] Claude AI pipeline (caption + hashtag generation for all 4 variants)
-6. [ ] Whisper transcription (for X thread generation)
-7. [ ] Review PWA — post review screen (mobile)
-8. [ ] Review PWA — settings screen
-9. [ ] Review PWA — dashboard screen
-10. [ ] n8n workflow setup (Drive watcher + Blotato posting)
-11. [ ] Push notifications (Web Push API + service worker)
-12. [ ] Weekly research cron (YouTube + Reddit + TikTok hashtags)
-13. [ ] Daily performance pull cron (IG + TikTok metrics)
-14. [ ] Carousel generation via nano-banana
-15. [ ] LinkedIn support (v2)
+1. [ ] **Plan 1** — Supabase schema + Next.js scaffold + Vercel deploy + PWA manifest
+2. [ ] Stitch screen designs (4 screens: post-review-mobile, dashboard-desktop, settings, new-post-mobile)
+3. [ ] **Plan 2** — Google Drive OAuth + Claude AI pipeline (4 content variants + Whisper transcription)
+4. [ ] **Plan 3** — Review PWA screens (Stitch designs → real UI: review, dashboard, settings)
+5. [ ] **Plan 4** — n8n + Blotato posting engine + push notifications
+6. [ ] **Plan 5** — Weekly research crons (YouTube, Reddit, TikTok) + daily metrics pull
+7. [ ] Carousel generation via nano-banana (Plan 3 or standalone)
+8. [ ] LinkedIn support (v2)
