@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest'
-import type { Post, PostVariant, PostStatus, Platform } from '../types'
+import { describe, it, expect, expectTypeOf } from 'vitest'
+import type { Post, PostVariant, PostStatus, Platform, ScheduleConfig } from '../types'
 
 describe('Supabase types', () => {
   it('Post type has required fields', () => {
@@ -15,13 +15,37 @@ describe('Supabase types', () => {
     expect(post.type).toBe('reel')
   })
 
-  it('PostVariant platform covers all 4 platforms', () => {
-    const platforms: Platform[] = ['instagram', 'tiktok', 'x_thread', 'x_video']
-    expect(platforms).toHaveLength(4)
+  it('Platform union covers all 4 platforms', () => {
+    const allPlatforms = (p: Platform): boolean => {
+      const map: Record<Platform, true> = {
+        instagram: true,
+        tiktok: true,
+        x_thread: true,
+        x_video: true,
+      }
+      return map[p]
+    }
+    expect(allPlatforms('instagram')).toBe(true)
+    expect(allPlatforms('tiktok')).toBe(true)
+    expect(allPlatforms('x_thread')).toBe(true)
+    expect(allPlatforms('x_video')).toBe(true)
   })
 
-  it('PostStatus covers all valid states', () => {
-    const statuses: PostStatus[] = ['pending_review', 'approved', 'rejected', 'published', 'failed']
-    expect(statuses).toHaveLength(5)
+  it('PostStatus union covers all valid states', () => {
+    const allStatuses = (s: PostStatus): boolean => {
+      const map: Record<PostStatus, true> = {
+        pending_review: true,
+        approved: true,
+        rejected: true,
+        published: true,
+        failed: true,
+      }
+      return map[s]
+    }
+    expect(allStatuses('pending_review')).toBe(true)
+    expect(allStatuses('approved')).toBe(true)
+    expect(allStatuses('rejected')).toBe(true)
+    expect(allStatuses('published')).toBe(true)
+    expect(allStatuses('failed')).toBe(true)
   })
 })

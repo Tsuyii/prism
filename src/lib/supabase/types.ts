@@ -56,10 +56,10 @@ export interface Database {
   public: {
     Tables: {
       posts: { Row: Post; Insert: Omit<Post, 'id' | 'created_at'>; Update: Partial<Post> }
-      post_variants: { Row: PostVariant; Insert: Omit<PostVariant, 'id'>; Update: Partial<PostVariant> }
+      post_variants: { Row: PostVariant; Insert: Omit<PostVariant, 'id'> & { approved?: boolean }; Update: Partial<PostVariant> }
       performance: { Row: Performance; Insert: Omit<Performance, 'id' | 'fetched_at'>; Update: Partial<Performance> }
       niche_trends: { Row: NicheTrend; Insert: Omit<NicheTrend, 'id' | 'fetched_at'>; Update: Partial<NicheTrend> }
-      schedule_config: { Row: ScheduleConfig; Insert: Omit<ScheduleConfig, 'id'>; Update: Partial<ScheduleConfig> }
+      schedule_config: { Row: ScheduleConfig; Insert: Omit<ScheduleConfig, 'id'> & { active?: boolean }; Update: Partial<ScheduleConfig> }
     }
   }
 }
