@@ -194,7 +194,7 @@ Worktree: `~/.config/superpowers/worktrees/Prism/plan-1-foundation` (branch: `pl
 
 | Plan | File | Status |
 |---|---|---|
-| Plan 1: Foundation | `docs/superpowers/plans/2026-04-16-plan-1-foundation.md` | Ready to execute |
+| Plan 1: Foundation | `docs/superpowers/plans/2026-04-16-plan-1-foundation.md` | Complete |
 | Plan 2: Drive + AI Pipeline | TBD | Not written yet |
 | Plan 3: Review PWA | TBD | Not written yet |
 | Plan 4: n8n + Blotato | TBD | Not written yet |
@@ -204,19 +204,27 @@ Worktree: `~/.config/superpowers/worktrees/Prism/plan-1-foundation` (branch: `pl
 
 ## Completed Features
 
-_None yet — project initialized._
+### Plan 1: Foundation (2026-04-17)
+- [x] Next.js 15 scaffold (App Router, TypeScript, Tailwind, Turbopack)
+- [x] Supabase clients (browser + server, typed with exhaustive Record checks)
+- [x] Database schema applied (5 tables, seeded schedule)
+- [x] Shared utilities (cn, formatScheduledTime, platformLabel)
+- [x] Placeholder pages: dashboard (/), review (/review/[id]), settings (/settings)
+- [x] PWA manifest + service worker (GET-only fetch guard, safe push handler, split icon purposes)
+- [x] Live Vercel deployment (env vars set, auto-deploy on push)
+- [x] Vitest test suite (8 passing tests)
 
 ---
 
 ## In Progress
 
-_Plan 1: Foundation — ready to execute in a fresh session._
+_Plan 2: Google Drive ingestion + Claude AI pipeline — not yet written._
 
 ---
 
 ## Pending (build order)
 
-1. [ ] **Plan 1** — Supabase schema + Next.js scaffold + Vercel deploy + PWA manifest
+1. [x] **Plan 1** — Supabase schema + Next.js scaffold + Vercel deploy + PWA manifest
 2. [ ] Stitch screen designs (4 screens: post-review-mobile, dashboard-desktop, settings, new-post-mobile)
 3. [ ] **Plan 2** — Google Drive OAuth + Claude AI pipeline (4 content variants + Whisper transcription)
 4. [ ] **Plan 3** — Review PWA screens (Stitch designs → real UI: review, dashboard, settings)
