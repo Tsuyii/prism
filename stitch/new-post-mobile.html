@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prism — New Post (Mobile)</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #09090B; color: #fff; max-width: 390px; margin: 0 auto; min-height: 100vh; }
+    .header { padding: 20px 16px 12px; text-align: center; border-bottom: 1px solid #27272A; }
+    .header-title { font-size: 17px; font-weight: 700; }
+    .content { padding: 24px 16px; display: flex; flex-direction: column; gap: 20px; }
+    .section-heading { font-size: 14px; font-weight: 600; color: #D4D4D8; }
+    .section-hint { font-size: 12px; color: #71717A; margin-top: 4px; line-height: 1.5; }
+    .field-label { font-size: 11px; font-weight: 600; color: #71717A; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+    .input-wrap { position: relative; }
+    input[type="text"] {
+      width: 100%; background: #18181B; border: 1px solid #3F3F46; border-radius: 12px;
+      padding: 14px 44px 14px 14px; color: #fff; font-size: 14px; line-height: 1.4;
+      font-family: inherit;
+    }
+    input[type="text"]::placeholder { color: #52525B; }
+    input[type="text"]:focus { outline: none; border-color: #8B5CF6; }
+    .paste-icon { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: #52525B; cursor: pointer; }
+    .type-group { display: flex; gap: 8px; }
+    .type-btn { flex: 1; padding: 12px; border-radius: 12px; font-size: 14px; font-weight: 600; cursor: pointer; border: 1px solid; transition: all 0.15s; }
+    .type-btn.selected { background: #7C3AED; border-color: #7C3AED; color: #fff; }
+    .type-btn.unselected { background: transparent; border-color: #3F3F46; color: #71717A; }
+    .start-btn { width: 100%; padding: 16px; background: #8B5CF6; border: none; border-radius: 14px; color: #fff; font-size: 15px; font-weight: 700; cursor: pointer; }
+    .footer-hint { font-size: 12px; color: #52525B; text-align: center; line-height: 1.6; }
+
+    /* Success state */
+    .success-state { display: none; flex-direction: column; align-items: center; gap: 16px; text-align: center; padding: 64px 24px; }
+    .success-icon { width: 56px; height: 56px; background: rgba(34,197,94,0.15); border-radius: 999px; display: flex; align-items: center; justify-content: center; }
+    .success-title { font-size: 18px; font-weight: 700; }
+    .success-sub { font-size: 14px; color: #71717A; }
+    .review-btn { padding: 12px 24px; background: #7C3AED; border: none; border-radius: 12px; color: #fff; font-size: 14px; font-weight: 600; cursor: pointer; }
+    .reset-link { font-size: 13px; color: #52525B; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <div class="header">
+    <div class="header-title">New Post</div>
+  </div>
+
+  <!-- Form State -->
+  <div class="content">
+    <div>
+      <div class="section-heading">Trigger pipeline manually</div>
+      <div class="section-hint">Paste a Google Drive file URL below to process a video immediately.</div>
+    </div>
+
+    <!-- Drive URL -->
+    <div>
+      <div class="field-label">Google Drive URL or File ID</div>
+      <div class="input-wrap">
+        <input type="text" placeholder="https://drive.google.com/file/d/..." value="" />
+        <div class="paste-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+            <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filename -->
+    <div>
+      <div class="field-label">Filename <span style="color:#3F3F46;text-transform:none;font-weight:400">(optional)</span></div>
+      <input type="text" placeholder="my-video.mp4" />
+    </div>
+
+    <!-- Content Type -->
+    <div>
+      <div class="field-label">Content Type</div>
+      <div class="type-group">
+        <button class="type-btn selected">Reel</button>
+        <button class="type-btn unselected">Carousel</button>
+      </div>
+    </div>
+
+    <button class="start-btn">Start Pipeline</button>
+
+    <div class="footer-hint">The file must be in your Google Drive folder. Claude will transcribe, generate captions, and queue it for your review.</div>
+  </div>
+
+  <!-- Success State (shown after pipeline starts) -->
+  <div class="success-state">
+    <div class="success-icon">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#4ADE80" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="20 6 9 17 4 12" />
+      </svg>
+    </div>
+    <div class="success-title">Pipeline started!</div>
+    <div class="success-sub">Claude is generating your content.<br>Check back in a minute.</div>
+    <button class="review-btn">Review when ready →</button>
+    <div class="reset-link">Submit another</div>
+  </div>
+</body>
+</html>

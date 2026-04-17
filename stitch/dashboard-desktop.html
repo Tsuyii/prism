@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prism — Dashboard (Desktop)</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #09090B; color: #fff; min-height: 100vh; display: flex; }
+    /* Sidebar */
+    .sidebar { width: 64px; border-right: 1px solid #27272A; display: flex; flex-direction: column; align-items: center; padding: 16px 0; gap: 8px; flex-shrink: 0; }
+    .logo { width: 36px; height: 36px; background: linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; }
+    .nav-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #52525B; cursor: pointer; }
+    .nav-icon.active { background: #1C1C1F; color: #A78BFA; }
+    .nav-icon:hover:not(.active) { color: #D4D4D8; }
+    .sidebar-spacer { flex: 1; }
+    .sidebar-version { font-size: 10px; color: #3F3F46; writing-mode: vertical-rl; }
+    /* Main */
+    .main { flex: 1; overflow-y: auto; padding: 32px; max-width: 900px; }
+    .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; }
+    .page-title { font-size: 22px; font-weight: 700; }
+    .btn-new { display: flex; align-items: center; gap: 6px; padding: 8px 16px; background: #8B5CF6; border: none; border-radius: 8px; color: #fff; font-size: 14px; font-weight: 600; cursor: pointer; }
+    /* Stats */
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 32px; }
+    .stat-card { background: #18181B; border: 1px solid #27272A; border-radius: 12px; padding: 16px 20px; }
+    .stat-value { font-size: 28px; font-weight: 700; line-height: 1; margin-bottom: 4px; }
+    .stat-value.yellow { color: #FACC15; }
+    .stat-value.green { color: #4ADE80; }
+    .stat-value.muted { color: #52525B; }
+    .stat-label { font-size: 12px; color: #71717A; }
+    /* Sections */
+    .section-title { font-size: 12px; font-weight: 600; color: #71717A; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 12px; }
+    .section { margin-bottom: 32px; }
+    /* Post cards */
+    .post-card { background: #18181B; border: 1px solid #27272A; border-radius: 12px; padding: 14px 18px; display: flex; align-items: center; gap: 14px; margin-bottom: 8px; }
+    .post-card.pending { border-color: rgba(251,191,36,0.2); }
+    .type-badge { font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
+    .type-badge.reel { background: rgba(139,92,246,0.2); color: #C4B5FD; }
+    .type-badge.carousel { background: rgba(59,130,246,0.2); color: #93C5FD; }
+    .post-info { flex: 1; min-width: 0; }
+    .post-name { font-size: 14px; font-weight: 500; color: #F4F4F5; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .post-meta { font-size: 12px; color: #52525B; margin-top: 2px; }
+    .post-actions { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+    .status-badge { font-size: 11px; font-weight: 500; padding: 3px 9px; border-radius: 999px; border: 1px solid; }
+    .status-badge.pending { background: rgba(234,179,8,0.1); color: #FDE047; border-color: rgba(234,179,8,0.3); }
+    .status-badge.published { background: rgba(34,197,94,0.1); color: #4ADE80; border-color: rgba(34,197,94,0.3); }
+    .status-badge.rejected { background: #27272A; color: #71717A; border-color: #3F3F46; }
+    .review-link { font-size: 13px; font-weight: 600; color: #A78BFA; cursor: pointer; }
+    /* Compact list */
+    .compact-list { background: #18181B; border: 1px solid #27272A; border-radius: 12px; overflow: hidden; }
+    .compact-row { display: flex; align-items: center; gap: 14px; padding: 12px 18px; border-bottom: 1px solid #27272A; }
+    .compact-row:last-child { border-bottom: none; }
+    .compact-meta { font-size: 12px; color: #71717A; }
+    /* Empty state */
+    .empty { text-align: center; padding: 64px 24px; }
+    .empty-icon { width: 48px; height: 48px; background: #18181B; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; }
+    .empty-text { font-size: 14px; color: #52525B; margin-bottom: 10px; }
+    .empty-link { font-size: 14px; color: #8B5CF6; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="logo">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+        <polygon points="12 2 22 20 2 20" />
+      </svg>
+    </div>
+    <div class="nav-icon active" title="Dashboard">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+        <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+      </svg>
+    </div>
+    <div class="nav-icon" title="New Post">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>
+      </svg>
+    </div>
+    <div class="nav-icon" title="Settings">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/>
+      </svg>
+    </div>
+    <div class="sidebar-spacer"></div>
+    <div class="sidebar-version">v0.3</div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+    <div class="page-header">
+      <h1 class="page-title">Dashboard</h1>
+      <button class="btn-new">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        New Post
+      </button>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-value">12</div><div class="stat-label">Total Posts</div></div>
+      <div class="stat-card"><div class="stat-value yellow">2</div><div class="stat-label">Pending Review</div></div>
+      <div class="stat-card"><div class="stat-value green">8</div><div class="stat-label">Published</div></div>
+      <div class="stat-card"><div class="stat-value muted">2</div><div class="stat-label">Rejected</div></div>
+    </div>
+
+    <!-- Pending Review -->
+    <div class="section">
+      <div class="section-title">Pending Review</div>
+      <div class="post-card pending">
+        <span class="type-badge reel">Reel</span>
+        <div class="post-info">
+          <div class="post-name">capcut-secret-button.mp4</div>
+          <div class="post-meta">Created Apr 17 · Scheduled today 6:00 PM</div>
+        </div>
+        <div class="post-actions">
+          <span class="status-badge pending">Pending Review</span>
+          <span class="review-link">Review →</span>
+        </div>
+      </div>
+      <div class="post-card pending">
+        <span class="type-badge carousel">Carousel</span>
+        <div class="post-info">
+          <div class="post-name">5-transitions-nobody-shows</div>
+          <div class="post-meta">Created Apr 16</div>
+        </div>
+        <div class="post-actions">
+          <span class="status-badge pending">Pending Review</span>
+          <span class="review-link">Review →</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Posts -->
+    <div class="section">
+      <div class="section-title">Recent Posts</div>
+      <div class="compact-list">
+        <div class="compact-row">
+          <span class="status-badge published">Published</span>
+          <span class="type-badge reel">Reel</span>
+          <div style="flex:1"><div class="post-name" style="font-size:13px">premiere-speed-run.mp4</div></div>
+          <span class="compact-meta">Apr 15</span>
+          <span class="compact-meta">Apr 15, 6:00 PM</span>
+        </div>
+        <div class="compact-row">
+          <span class="status-badge published">Published</span>
+          <span class="type-badge carousel">Carousel</span>
+          <div style="flex:1"><div class="post-name" style="font-size:13px">davinci-color-grading</div></div>
+          <span class="compact-meta">Apr 14</span>
+          <span class="compact-meta">Apr 14, 6:30 PM</span>
+        </div>
+        <div class="compact-row">
+          <span class="status-badge rejected">Rejected</span>
+          <span class="type-badge reel">Reel</span>
+          <div style="flex:1"><div class="post-name" style="font-size:13px">rough-cut-test.mp4</div></div>
+          <span class="compact-meta">Apr 13</span>
+          <span class="compact-meta">—</span>
+        </div>
+      </div>
+    </div>
+  </main>
+</body>
+</html>
