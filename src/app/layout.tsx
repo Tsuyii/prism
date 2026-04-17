@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import { Geist } from 'next/font/google'
+import { Nav } from '@/components/nav'
 import './globals.css'
 
 const geist = Geist({ subsets: ['latin'] })
@@ -24,8 +25,11 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={geist.className}>
-        {children}
+      <body className={`${geist.className} flex flex-col min-h-screen bg-zinc-950 text-white md:flex-row`}>
+        <Nav />
+        <main className="flex-1 overflow-y-auto pb-20 md:pb-0">
+          {children}
+        </main>
         <script
           dangerouslySetInnerHTML={{
             __html: `
