@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createServiceClient } from '@/lib/supabase/server'
 
+// TODO(Plan 3): Add authentication guard (REVIEW_SECRET or session-based auth)
 export async function POST(request: NextRequest) {
   let body: { postId?: string; scheduledAt?: string }
   try {
@@ -14,7 +15,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'postId is required' }, { status: 400 })
   }
 
-  const supabase = await createClient()
+  const supabase = createServiceClient()
 
   // Fetch post + variants
   const { data: post, error: postError } = await supabase
@@ -25,6 +26,13 @@ export async function POST(request: NextRequest) {
 
   if (postError || !post) {
     return NextResponse.json({ error: 'Post not found' }, { status: 404 })
+  }
+
+  if (post.status !== 'pending_review') {
+    return NextResponse.json(
+      { error: `Post is already ${post.status}` },
+      { status: 409 },
+    )
   }
 
   // Update post status and scheduled time
@@ -41,10 +49,13 @@ export async function POST(request: NextRequest) {
   }
 
   // Mark all variants as approved
-  await supabase
+  const { error: variantsError } = await supabase
     .from('post_variants')
     .update({ approved: true })
     .eq('post_id', postId)
+  if (variantsError) {
+    console.error('[approve] Failed to mark variants approved:', variantsError)
+  }
 
   // Fire n8n posting webhook
   if (process.env.N8N_WEBHOOK_URL) {
