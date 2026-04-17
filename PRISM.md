@@ -195,7 +195,7 @@ Worktree: `~/.config/superpowers/worktrees/Prism/plan-1-foundation` (branch: `pl
 | Plan | File | Status |
 |---|---|---|
 | Plan 1: Foundation | `docs/superpowers/plans/2026-04-16-plan-1-foundation.md` | Complete |
-| Plan 2: Drive + AI Pipeline | TBD | Not written yet |
+| Plan 2: Drive + AI Pipeline | `docs/superpowers/plans/2026-04-17-plan-2-drive-ai-pipeline.md` | Tasks 1–6 complete |
 | Plan 3: Review PWA | TBD | Not written yet |
 | Plan 4: n8n + Blotato | TBD | Not written yet |
 | Plan 5: Research + Metrics | TBD | Not written yet |
@@ -203,6 +203,15 @@ Worktree: `~/.config/superpowers/worktrees/Prism/plan-1-foundation` (branch: `pl
 ---
 
 ## Completed Features
+
+### Plan 2: Drive + AI Pipeline — Tasks 1–6 (2026-04-17)
+- [x] Google Drive client (service account, file download)
+- [x] Whisper transcription (25 MB limit guard, multi-format)
+- [x] Claude Sonnet content generation (cached system prompt, Zod structured output)
+- [x] 4 platform variants: Instagram, TikTok, X Thread, X Video
+- [x] Pipeline webhook `/api/pipeline` (n8n → Whisper → Claude → Supabase)
+- [x] Generated Supabase types (CLI-generated, replaces hand-written types)
+- [x] Unit tests (6 new, 14 total passing)
 
 ### Plan 1: Foundation (2026-04-17)
 - [x] Next.js 15 scaffold (App Router, TypeScript, Tailwind, Turbopack)
@@ -218,7 +227,7 @@ Worktree: `~/.config/superpowers/worktrees/Prism/plan-1-foundation` (branch: `pl
 
 ## In Progress
 
-_Plan 2: Google Drive ingestion + Claude AI pipeline — not yet written._
+_Plan 2: Tasks 7–10 remaining (approve, reject, n8n callback routes + env vars + PRISM.md final update)._
 
 ---
 
