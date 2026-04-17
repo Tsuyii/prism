@@ -81,6 +81,7 @@ ANTHROPIC_API_KEY=
 # Google APIs
 GOOGLE_CLIENT_ID=
 GOOGLE_CLIENT_SECRET=
+GOOGLE_SERVICE_ACCOUNT_KEY=           # Service account JSON for Drive download
 GOOGLE_DRIVE_FOLDER_ID=           # ID of /SocialMedia/Queue/ folder
 YOUTUBE_API_KEY=
 
@@ -99,6 +100,9 @@ TIKTOK_ACCESS_TOKEN=
 # n8n
 N8N_WEBHOOK_URL=                  # URL of n8n pipeline webhook
 N8N_API_KEY=
+
+# Pipeline security (n8n sends this as Authorization: Bearer <value>)
+PIPELINE_SECRET=                  # Secures /api/pipeline webhook from n8n
 
 # Vercel Cron (set in vercel.json)
 CRON_SECRET=                      # validate cron requests are from Vercel
@@ -195,7 +199,7 @@ Worktree: `~/.config/superpowers/worktrees/Prism/plan-1-foundation` (branch: `pl
 | Plan | File | Status |
 |---|---|---|
 | Plan 1: Foundation | `docs/superpowers/plans/2026-04-16-plan-1-foundation.md` | Complete |
-| Plan 2: Drive + AI Pipeline | `docs/superpowers/plans/2026-04-17-plan-2-drive-ai-pipeline.md` | Tasks 1–6 complete |
+| Plan 2: Drive + AI Pipeline | `docs/superpowers/plans/2026-04-17-plan-2-drive-ai-pipeline.md` | Complete |
 | Plan 3: Review PWA | TBD | Not written yet |
 | Plan 4: n8n + Blotato | TBD | Not written yet |
 | Plan 5: Research + Metrics | TBD | Not written yet |
@@ -204,13 +208,15 @@ Worktree: `~/.config/superpowers/worktrees/Prism/plan-1-foundation` (branch: `pl
 
 ## Completed Features
 
-### Plan 2: Drive + AI Pipeline — Tasks 1–6 (2026-04-17)
+### Plan 2: Drive + AI Pipeline (2026-04-17)
 - [x] Google Drive client (service account, file download)
 - [x] Whisper transcription (25 MB limit guard, multi-format)
 - [x] Claude Sonnet content generation (cached system prompt, Zod structured output)
 - [x] 4 platform variants: Instagram, TikTok, X Thread, X Video
 - [x] Pipeline webhook `/api/pipeline` (n8n → Whisper → Claude → Supabase)
-- [x] Generated Supabase types (CLI-generated, replaces hand-written types)
+- [x] Approve route `/api/approve` (updates Supabase + fires n8n webhook)
+- [x] Reject route `/api/reject`
+- [x] n8n callback `/api/webhook/n8n` (published/failed status update)
 - [x] Unit tests (6 new, 14 total passing)
 
 ### Plan 1: Foundation (2026-04-17)
@@ -227,7 +233,7 @@ Worktree: `~/.config/superpowers/worktrees/Prism/plan-1-foundation` (branch: `pl
 
 ## In Progress
 
-_Plan 2: Tasks 7–10 remaining (approve, reject, n8n callback routes + env vars + PRISM.md final update)._
+_Plan 3: Review PWA screens (Stitch designs → real UI)_
 
 ---
 
