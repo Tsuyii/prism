@@ -19,13 +19,20 @@ self.addEventListener('activate', (event) => {
 })
 
 self.addEventListener('fetch', (event) => {
+  if (event.request.method !== 'GET') return
   event.respondWith(
     fetch(event.request).catch(() => caches.match(event.request))
   )
 })
 
 self.addEventListener('push', (event) => {
-  const data = event.data?.json() ?? { title: 'Prism', body: 'New post ready for review' }
+  let data
+  try {
+    data = event.data?.json()
+  } catch {
+    data = null
+  }
+  data ??= { title: 'Prism', body: 'New post ready for review' }
   event.waitUntil(
     self.registration.showNotification(data.title, {
       body: data.body,
