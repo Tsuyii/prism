@@ -2,12 +2,11 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/server'
 
 export async function POST(request: NextRequest) {
-  // Optional: validate n8n secret header
+  // Validate n8n secret header — set N8N_API_KEY in production
   const authHeader = request.headers.get('authorization')
-  if (
-    process.env.N8N_API_KEY &&
-    authHeader !== `Bearer ${process.env.N8N_API_KEY}`
-  ) {
+  if (!process.env.N8N_API_KEY) {
+    console.warn('[n8n callback] N8N_API_KEY is not set — accepting unauthenticated requests (set in production)')
+  } else if (authHeader !== `Bearer ${process.env.N8N_API_KEY}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
