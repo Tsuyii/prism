@@ -14,6 +14,10 @@ export async function POST(request: NextRequest) {
   if (!postId) {
     return NextResponse.json({ error: 'postId is required' }, { status: 400 })
   }
+  const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+  if (!UUID_RE.test(postId)) {
+    return NextResponse.json({ error: 'postId must be a valid UUID' }, { status: 400 })
+  }
 
   const supabase = createServiceClient()
 
