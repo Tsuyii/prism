@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
-import { generateContentVariants } from '@/lib/claude'
+import { createServiceClient } from '@/lib/supabase/server'
+import { generateContentVariants, type ContentVariants } from '@/lib/claude'
 import { downloadFileAsBuffer } from '@/lib/drive'
 import { transcribeBuffer } from '@/lib/whisper'
 
@@ -18,7 +18,11 @@ function classify(mimeType: string): 'reel' | 'carousel' {
 export async function POST(request: NextRequest) {
   // ── Auth ──────────────────────────────────────────────────────────────────
   const authHeader = request.headers.get('authorization')
-  if (!authHeader || authHeader !== `Bearer ${process.env.PIPELINE_SECRET}`) {
+  if (
+    !process.env.PIPELINE_SECRET ||
+    !authHeader ||
+    authHeader !== `Bearer ${process.env.PIPELINE_SECRET}`
+  ) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
@@ -35,7 +39,7 @@ export async function POST(request: NextRequest) {
   }
 
   const contentType = classify(mimeType)
-  const supabase = await createClient()
+  const supabase = createServiceClient()
 
   // ── Create post record ────────────────────────────────────────────────────
   const { data: post, error: postError } = await supabase
@@ -54,7 +58,7 @@ export async function POST(request: NextRequest) {
   if (contentType === 'reel') {
     try {
       const buffer = await downloadFileAsBuffer(fileId)
-      transcript = await transcribeBuffer(buffer, fileName)
+      transcript = (await transcribeBuffer(buffer, fileName)) || undefined
     } catch (err) {
       console.warn('[pipeline] Transcription failed (non-fatal):', err)
     }
@@ -75,14 +79,18 @@ export async function POST(request: NextRequest) {
   ])
 
   // ── Generate content with Claude ──────────────────────────────────────────
-  let variants
+  let variants: ContentVariants
   try {
     variants = await generateContentVariants({
       contentType,
       filename: fileName,
       transcript,
       trendData: trendsResult.data ?? [],
-      performanceData: perfResult.data ?? [],
+      performanceData: (perfResult.data ?? []).map(p => ({
+        platform: p.platform,
+        views: p.views ?? 0,
+        likes: p.likes ?? 0,
+      })),
     })
   } catch (err) {
     console.error('[pipeline] Claude generation failed:', err)
@@ -131,12 +139,15 @@ export async function POST(request: NextRequest) {
 
   // ── Store film_next as a niche trend hint ─────────────────────────────────
   // Cheap way to surface the recommendation in the review UI without schema changes
-  await supabase.from('niche_trends').insert({
+  const { error: filmNextError } = await supabase.from('niche_trends').insert({
     source: 'claude',
     topic: variants.film_next,
     score: null,
     raw_data: { type: 'film_next_recommendation', post_id: post.id },
   })
+  if (filmNextError) {
+    console.warn('[pipeline] Failed to store film_next recommendation (non-fatal):', filmNextError)
+  }
 
   console.log(`[pipeline] Post ${post.id} created with ${variantRows.length} variants`)
 
