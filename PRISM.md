@@ -182,15 +182,7 @@ create table schedule_config (
 **Subagent-driven development** — always use `superpowers:subagent-driven-development` when executing plans. One fresh subagent per task, review between tasks.
 
 **Push policy — push every task to master:**
-After each task passes spec + code quality review, merge the worktree branch into master and push. This ensures every task gets a GitHub contribution and triggers a Vercel deploy.
-
-```bash
-# After each task is approved (run from main repo root):
-git merge plan-1-foundation --ff-only
-git push origin master
-```
-
-Worktree: `~/.config/superpowers/worktrees/Prism/plan-1-foundation` (branch: `plan-1-foundation`)
+After each task passes spec + code quality review, commit and push directly to master. This ensures every task gets a GitHub contribution and triggers a Vercel deploy.
 
 ---
 
@@ -241,7 +233,7 @@ _Plan 3: Review PWA screens (Stitch designs → real UI)_
 
 1. [x] **Plan 1** — Supabase schema + Next.js scaffold + Vercel deploy + PWA manifest
 2. [ ] Stitch screen designs (4 screens: post-review-mobile, dashboard-desktop, settings, new-post-mobile)
-3. [ ] **Plan 2** — Google Drive OAuth + Claude AI pipeline (4 content variants + Whisper transcription)
+3. [x] **Plan 2** — Google Drive + Whisper + Claude AI pipeline + approve/reject/n8n callback routes
 4. [ ] **Plan 3** — Review PWA screens (Stitch designs → real UI: review, dashboard, settings)
 5. [ ] **Plan 4** — n8n + Blotato posting engine + push notifications
 6. [ ] **Plan 5** — Weekly research crons (YouTube, Reddit, TikTok) + daily metrics pull
