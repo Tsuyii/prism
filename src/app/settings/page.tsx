@@ -1,10 +1,13 @@
-import { Placeholder } from '@/components/ui/placeholder'
+import { createClient } from '@/lib/supabase/server'
+import { SettingsClient } from './settings-client'
 
-export default function SettingsPage() {
-  return (
-    <Placeholder
-      title="Settings"
-      description="Schedule configuration and platform credentials — coming in Plan 3."
-    />
-  )
+export default async function SettingsPage() {
+  const supabase = await createClient()
+
+  const { data: schedule } = await supabase
+    .from('schedule_config')
+    .select('*')
+    .order('day_of_week')
+
+  return <SettingsClient initialSchedule={schedule ?? []} />
 }
