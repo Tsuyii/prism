@@ -45,7 +45,7 @@ export function Nav() {
   const pathname = usePathname()
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-zinc-800 bg-zinc-950 pb-safe md:relative md:bottom-auto md:left-auto md:right-auto md:border-t-0 md:border-r md:h-full md:w-16 md:flex-col md:pb-0">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-zinc-800 bg-zinc-950 pb-[env(safe-area-inset-bottom,0px)] md:relative md:bottom-auto md:left-auto md:right-auto md:border-t-0 md:border-r md:min-h-screen md:w-16 md:pb-0">
       <ul className="flex h-16 items-center justify-around md:flex-col md:h-auto md:justify-start md:gap-2 md:pt-4">
         {NAV_ITEMS.map(({ href, label, icon }) => {
           const active = pathname === href
@@ -54,7 +54,7 @@ export function Nav() {
               <Link
                 href={href}
                 className={cn(
-                  'flex flex-col items-center gap-1 px-4 py-2 text-xs transition-colors md:flex-col md:px-3 md:py-3 md:rounded-lg md:mx-1',
+                  'flex flex-col items-center gap-1 px-4 py-2 text-xs transition-colors md:px-3 md:py-3 md:rounded-lg md:mx-1',
                   active
                     ? 'text-violet-400'
                     : 'text-zinc-500 hover:text-zinc-300',
