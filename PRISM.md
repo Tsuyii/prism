@@ -192,13 +192,23 @@ After each task passes spec + code quality review, commit and push directly to m
 |---|---|---|
 | Plan 1: Foundation | `docs/superpowers/plans/2026-04-16-plan-1-foundation.md` | Complete |
 | Plan 2: Drive + AI Pipeline | `docs/superpowers/plans/2026-04-17-plan-2-drive-ai-pipeline.md` | Complete |
-| Plan 3: Review PWA | TBD | Not written yet |
+| Plan 3: Review PWA | `docs/superpowers/plans/2026-04-17-plan-3-review-pwa.md` | In Progress (Tasks 1–2 done) |
 | Plan 4: n8n + Blotato | TBD | Not written yet |
 | Plan 5: Research + Metrics | TBD | Not written yet |
 
 ---
 
 ## Completed Features
+
+### Plan 3: Review PWA — partial (2026-04-18)
+- [x] Stitch screen designs (4 HTML files in `stitch/`: post-review-mobile, dashboard-desktop, settings, new-post-mobile)
+- [x] Shared bottom nav (`src/components/nav.tsx`) — mobile bottom bar + md sidebar, violet active state, safe-area env fix, viewport-fit cover
+- [x] Root layout updated (`src/app/layout.tsx`) — Nav wired in, bg-zinc-950, proper body/main flex structure
+- [ ] Review page `/review/[id]` — **next task**
+- [ ] Dashboard page `/`
+- [ ] Settings page `/settings` + `PATCH /api/settings`
+- [ ] New Post page `/new`
+- [ ] Unit tests (5 new target, 19 total)
 
 ### Plan 2: Drive + AI Pipeline (2026-04-17)
 - [x] Google Drive client (service account, file download)
@@ -225,14 +235,14 @@ After each task passes spec + code quality review, commit and push directly to m
 
 ## In Progress
 
-_Plan 3: Review PWA screens (Stitch designs → real UI)_
+_Plan 3: Review PWA — Tasks 1–2 done (Stitch designs, shared nav + layout). Next: Task 3 (Review page), then Dashboard, Settings, New Post._
 
 ---
 
 ## Pending (build order)
 
 1. [x] **Plan 1** — Supabase schema + Next.js scaffold + Vercel deploy + PWA manifest
-2. [ ] Stitch screen designs (4 screens: post-review-mobile, dashboard-desktop, settings, new-post-mobile)
+2. [x] Stitch screen designs (4 screens: post-review-mobile, dashboard-desktop, settings, new-post-mobile)
 3. [x] **Plan 2** — Google Drive + Whisper + Claude AI pipeline + approve/reject/n8n callback routes
 4. [ ] **Plan 3** — Review PWA screens (Stitch designs → real UI: review, dashboard, settings)
 5. [ ] **Plan 4** — n8n + Blotato posting engine + push notifications
