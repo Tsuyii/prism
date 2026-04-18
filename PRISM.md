@@ -106,6 +106,11 @@ PIPELINE_SECRET=                  # Secures /api/pipeline webhook from n8n
 
 # Vercel Cron (set in vercel.json)
 CRON_SECRET=                      # validate cron requests are from Vercel
+
+# Web Push (VAPID)
+NEXT_PUBLIC_VAPID_PUBLIC_KEY=     # VAPID public key (exposed to browser)
+VAPID_PRIVATE_KEY=                # VAPID private key (server only)
+VAPID_SUBJECT=                    # mailto: or https: contact URI for VAPID
 ```
 
 ---
