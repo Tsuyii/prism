@@ -1,9 +1,6 @@
 import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { ReviewClient } from './review-client'
-import type { Platform } from '@/lib/supabase/types'
-
-const PLATFORMS: Platform[] = ['instagram', 'tiktok', 'x_thread', 'x_video']
+import { ReviewClient, PLATFORMS } from './review-client'
 
 export default async function ReviewPage({
   params,

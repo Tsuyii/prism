@@ -3,9 +3,10 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { cn, platformLabel } from '@/lib/utils'
+import { createClient } from '@/lib/supabase/client'
 import type { Post, PostVariant, Platform } from '@/lib/supabase/types'
 
-const PLATFORMS: Platform[] = ['instagram', 'tiktok', 'x_thread', 'x_video']
+export const PLATFORMS: Platform[] = ['instagram', 'tiktok', 'x_thread', 'x_video']
 
 interface ReviewClientProps {
   post: Post
@@ -49,16 +50,35 @@ export function ReviewClient({ post, variants, filmNext }: ReviewClientProps) {
     return d.toISOString().slice(0, 16)
   }
 
+  function localDatetimeToISO(localStr: string): string {
+    const [datePart, timePart] = localStr.split('T')
+    const [year, month, day] = datePart.split('-').map(Number)
+    const [hour, minute] = timePart.split(':').map(Number)
+    return new Date(year, month - 1, day, hour, minute).toISOString()
+  }
+
   async function handleApprove() {
     setError(null)
     setLoading('approve')
     try {
+      const supabase = createClient()
+      for (const platform of PLATFORMS) {
+        const edit = edits[platform]
+        const hashtags = edit.hashtags.split(/\s+/).filter(Boolean)
+        const { error: updateError } = await supabase
+          .from('post_variants')
+          .update({ caption: edit.caption, hashtags })
+          .eq('post_id', post.id)
+          .eq('platform', platform)
+        if (updateError) throw new Error(`Failed to save ${platform} edits`)
+      }
+
       const res = await fetch('/api/approve', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           postId: post.id,
-          scheduledAt: new Date(scheduledAt).toISOString(),
+          scheduledAt: localDatetimeToISO(scheduledAt),
         }),
       })
       if (!res.ok) {
