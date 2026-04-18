@@ -151,6 +151,18 @@ export async function POST(request: NextRequest) {
 
   console.log(`[pipeline] Post ${post.id} created with ${variantRows.length} variants`)
 
+  // Fire push notification (non-fatal)
+  try {
+    const { sendPushToAll } = await import('@/lib/push')
+    await sendPushToAll({
+      title: 'Prism — Content ready',
+      body: `${contentType === 'reel' ? 'Reel' : 'Carousel'} is ready to review`,
+      postId: post.id,
+    })
+  } catch (err) {
+    console.warn('[pipeline] Push notification failed (non-fatal):', err)
+  }
+
   return NextResponse.json({
     postId: post.id,
     bestPostTime: variants.best_post_time,
