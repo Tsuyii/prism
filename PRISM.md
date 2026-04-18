@@ -194,7 +194,8 @@ After each task passes spec + code quality review, commit and push directly to m
 | Plan 2: Drive + AI Pipeline | `docs/superpowers/plans/2026-04-17-plan-2-drive-ai-pipeline.md` | Complete |
 | Plan 3: Review PWA | `docs/superpowers/plans/2026-04-17-plan-3-review-pwa.md` | Complete |
 | Plan 4: n8n + Blotato | TBD | Not written yet |
-| Plan 5: Research + Metrics | TBD | Not written yet |
+| Plan 5: Research tab + spy cron | TBD | Not written yet |
+| Plan 6: Metrics tab + performance loop | TBD | Not written yet |
 
 ---
 
@@ -246,6 +247,7 @@ _Plan 4: n8n + Blotato posting engine + push notifications — not yet written._
 3. [x] **Plan 2** — Google Drive + Whisper + Claude AI pipeline + approve/reject/n8n callback routes
 4. [x] **Plan 3** — Review PWA screens (Stitch designs → real UI: review, dashboard, settings)
 5. [ ] **Plan 4** — n8n + Blotato posting engine + push notifications
-6. [ ] **Plan 5** — Weekly research crons (YouTube, Reddit, TikTok) + daily metrics pull
-7. [ ] Carousel generation via nano-banana (Plan 3 or standalone)
-8. [ ] LinkedIn support (v2)
+6. [ ] **Plan 5** — Research tab UI + weekly spy cron (YouTube, TikTok, Reddit trending content with Claude analysis)
+7. [ ] **Plan 6** — Metrics tab + daily performance pull + personal engagement loop
+8. [ ] Carousel generation via nano-banana (standalone)
+9. [ ] LinkedIn support (v2)
