@@ -54,6 +54,14 @@ create table if not exists schedule_config (
   active boolean default true
 );
 
+create table if not exists push_subscriptions (
+  id uuid primary key default gen_random_uuid(),
+  endpoint text not null unique,
+  p256dh text not null,
+  auth text not null,
+  created_at timestamptz default now()
+);
+
 -- Seed default schedule (Mon/Wed/Fri = reels at 6pm, Tue/Thu = carousels at 12pm)
 insert into schedule_config (day_of_week, content_type, preferred_hour) values
   (1, 'reel', 18),
