@@ -20,7 +20,11 @@ function isExpiringSoon(expiresAt: Date): boolean {
  * Refresh a platform token using the platform's OAuth refresh flow.
  * X (OAuth 1.0a) tokens never expire — calling this for X throws.
  */
-async function refreshToken(platform: 'instagram' | 'tiktok'): Promise<string> {
+async function refreshToken(platform: 'instagram' | 'tiktok' | 'x'): Promise<string> {
+  if (platform === 'x') {
+    throw new Error('X tokens use OAuth 1.0a and do not expire — manual rotation required')
+  }
+
   if (platform === 'instagram') {
     const appId = process.env.INSTAGRAM_APP_ID
     const appSecret = process.env.INSTAGRAM_APP_SECRET
@@ -174,11 +178,7 @@ export async function getToken(platform: Platform): Promise<string> {
   if (row.expires_at) {
     const expiresAt = new Date(row.expires_at)
     if (isExpiringSoon(expiresAt)) {
-      if (platform === 'x') {
-        // X uses OAuth 1.0a — tokens don't expire, nothing to do
-        return row.access_token
-      }
-      return await refreshToken(platform as 'instagram' | 'tiktok')
+      return await refreshToken(platform)
     }
   }
 

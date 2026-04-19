@@ -132,7 +132,7 @@ describe('platform-tokens', () => {
       expect(mockFetch).not.toHaveBeenCalled()
     })
 
-    it('returns x token from DB without triggering refresh even with near expiry', async () => {
+    it('throws when x token is near expiry because X uses OAuth 1.0a and cannot be refreshed', async () => {
       const nearExpiry = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString() // +3 days
       mockRow = {
         access_token: 'x-db-token',
@@ -140,9 +140,9 @@ describe('platform-tokens', () => {
         expires_at: nearExpiry,
       }
 
-      // X tokens never expire — just returns the existing token
-      const token = await getToken('x')
-      expect(token).toBe('x-db-token')
+      await expect(getToken('x')).rejects.toThrow(
+        'X tokens use OAuth 1.0a and do not expire — manual rotation required',
+      )
       expect(mockFetch).not.toHaveBeenCalled()
     })
   })
