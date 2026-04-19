@@ -153,6 +153,27 @@ export type Database = {
         }
         Relationships: []
       }
+      platform_tokens: {
+        Row: {
+          platform: string
+          access_token: string
+          refresh_token: string | null
+          expires_at: string | null
+        }
+        Insert: {
+          platform: string
+          access_token: string
+          refresh_token?: string | null
+          expires_at?: string | null
+        }
+        Update: {
+          platform?: string
+          access_token?: string
+          refresh_token?: string | null
+          expires_at?: string | null
+        }
+        Relationships: []
+      }
       push_subscriptions: {
         Row: {
           auth: string
