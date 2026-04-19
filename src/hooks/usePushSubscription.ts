@@ -35,7 +35,7 @@ export function usePushSubscription() {
         ),
       })
       const json = sub.toJSON()
-      await fetch('/api/push/subscribe', {
+      const res = await fetch('/api/push/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -44,7 +44,7 @@ export function usePushSubscription() {
           auth: json.keys?.auth,
         }),
       })
-      setSubscribed(true)
+      if (res.ok) setSubscribed(true)
     } finally {
       setLoading(false)
     }
@@ -59,12 +59,12 @@ export function usePushSubscription() {
       if (!sub) return
       const endpoint = sub.endpoint
       await sub.unsubscribe()
-      await fetch('/api/push/subscribe', {
+      const res = await fetch('/api/push/subscribe', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ endpoint }),
       })
-      setSubscribed(false)
+      if (res.ok) setSubscribed(false)
     } finally {
       setLoading(false)
     }

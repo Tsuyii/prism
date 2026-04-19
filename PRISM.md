@@ -198,13 +198,23 @@ After each task passes spec + code quality review, commit and push directly to m
 | Plan 1: Foundation | `docs/superpowers/plans/2026-04-16-plan-1-foundation.md` | Complete |
 | Plan 2: Drive + AI Pipeline | `docs/superpowers/plans/2026-04-17-plan-2-drive-ai-pipeline.md` | Complete |
 | Plan 3: Review PWA | `docs/superpowers/plans/2026-04-17-plan-3-review-pwa.md` | Complete |
-| Plan 4: n8n + Blotato | TBD | Not written yet |
+| Plan 4: Push Notifications | `docs/superpowers/plans/2026-04-19-plan-4-push-notifications.md` | Complete |
 | Plan 5: Research tab + spy cron | TBD | Not written yet |
 | Plan 6: Metrics tab + performance loop | TBD | Not written yet |
 
 ---
 
 ## Completed Features
+
+### Plan 4: Push Notifications (2026-04-19)
+- [x] `web-push` v3.6.7 installed, VAPID keys generated
+- [x] `push_subscriptions` table in Supabase (endpoint unique, p256dh, auth)
+- [x] `src/lib/push.ts` — `sendPushToAll()` utility (410 cleanup, Promise.allSettled)
+- [x] `POST/DELETE /api/push/subscribe` — save/remove push subscriptions
+- [x] Pipeline fires push notification after content variants saved (non-fatal, dynamic import)
+- [x] `src/hooks/usePushSubscription.ts` — subscribe/unsubscribe hook with permission flow
+- [x] Bell icon button in dashboard header (yellow when subscribed, outline when not)
+- [x] Unit tests (10 new, 30 total passing)
 
 ### Plan 3: Review PWA (2026-04-18)
 - [x] Stitch screen designs (4 HTML files in `stitch/`: post-review-mobile, dashboard-desktop, settings, new-post-mobile)
@@ -241,7 +251,7 @@ After each task passes spec + code quality review, commit and push directly to m
 
 ## In Progress
 
-_Plan 4: n8n + Blotato posting engine + push notifications — not yet written._
+_Plan 5: Research tab + weekly spy cron — not yet written._
 
 ---
 
@@ -251,7 +261,7 @@ _Plan 4: n8n + Blotato posting engine + push notifications — not yet written._
 2. [x] Stitch screen designs (4 screens: post-review-mobile, dashboard-desktop, settings, new-post-mobile)
 3. [x] **Plan 2** — Google Drive + Whisper + Claude AI pipeline + approve/reject/n8n callback routes
 4. [x] **Plan 3** — Review PWA screens (Stitch designs → real UI: review, dashboard, settings)
-5. [ ] **Plan 4** — n8n + Blotato posting engine + push notifications
+5. [x] **Plan 4** — Push notifications (VAPID, push_subscriptions table, subscribe route, pipeline trigger, bell button)
 6. [ ] **Plan 5** — Research tab UI + weekly spy cron (YouTube, TikTok, Reddit trending content with Claude analysis)
 7. [ ] **Plan 6** — Metrics tab + daily performance pull + personal engagement loop
 8. [ ] Carousel generation via nano-banana (standalone)
