@@ -109,8 +109,15 @@ INSTAGRAM_BUSINESS_ACCOUNT_ID=
 TIKTOK_CLIENT_KEY=
 TIKTOK_CLIENT_SECRET=
 TIKTOK_ACCESS_TOKEN=
+TIKTOK_REFRESH_TOKEN=             # Used to auto-refresh 24h access tokens
 
-# n8n
+# X (Twitter) — OAuth 1.0a (permanent, no expiry)
+X_API_KEY=
+X_API_SECRET=
+X_ACCESS_TOKEN=
+X_ACCESS_TOKEN_SECRET=
+
+# n8n (only needed for Google Drive trigger — no longer used for posting)
 N8N_WEBHOOK_URL=                  # URL of n8n pipeline webhook
 N8N_API_KEY=
 
@@ -220,8 +227,9 @@ After each task passes spec + code quality review, commit and push directly to m
 | Plan 2: Drive + AI Pipeline | `docs/superpowers/plans/2026-04-17-plan-2-drive-ai-pipeline.md` | Complete |
 | Plan 3: Review PWA | `docs/superpowers/plans/2026-04-17-plan-3-review-pwa.md` | Complete |
 | Plan 4: Push Notifications | `docs/superpowers/plans/2026-04-19-plan-4-push-notifications.md` | Complete |
-| Plan 5: Research tab + spy cron | TBD | Not written yet |
-| Plan 6: Metrics tab + performance loop | TBD | Not written yet |
+| Plan 5: Research tab + spy cron | `docs/superpowers/plans/2026-04-19-plan-5-research-cron.md` | Complete |
+| Plan 6: Direct platform posting (replace Blotato) | `docs/superpowers/plans/2026-04-19-plan-6-direct-posting.md` | Complete |
+| Plan 7: Metrics tab + performance loop | TBD | Not written yet |
 
 ---
 
@@ -290,7 +298,7 @@ View in Stitch project `12320735979743494453` and tell Claude which variant(s) t
 
 ## In Progress
 
-_Design variant selection pending. Plan 5: Research tab + weekly spy cron — not yet written._
+_Design variant selection pending. Plan 6: Metrics tab + daily performance pull — not yet written._
 
 ---
 
@@ -301,7 +309,8 @@ _Design variant selection pending. Plan 5: Research tab + weekly spy cron — no
 3. [x] **Plan 2** — Google Drive + Whisper + Claude AI pipeline + approve/reject/n8n callback routes
 4. [x] **Plan 3** — Review PWA screens (Stitch designs → real UI: review, dashboard, settings)
 5. [x] **Plan 4** — Push notifications (VAPID, push_subscriptions table, subscribe route, pipeline trigger, bell button)
-6. [ ] **Plan 5** — Research tab UI + weekly spy cron (YouTube, TikTok, Reddit trending content with Claude analysis)
-7. [ ] **Plan 6** — Metrics tab + daily performance pull + personal engagement loop
+6. [x] **Plan 5** — Research tab UI + weekly spy cron (YouTube, TikTok, Reddit trending content with Claude analysis)
+6. [x] **Plan 6** — Direct platform posting (Instagram Graph API, TikTok Content API, X API v2 — replaces Blotato)
+7. [ ] **Plan 7** — Metrics tab + daily performance pull + personal engagement loop
 8. [ ] Carousel generation via nano-banana (standalone)
 9. [ ] LinkedIn support (v2)
