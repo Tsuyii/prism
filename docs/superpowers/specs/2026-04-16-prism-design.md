@@ -190,6 +190,26 @@ X (Twitter) performance metrics excluded from v1 due to $100/mo API cost. Linked
 
 ---
 
+## Design
+
+- **Tool:** Stitch — generates HTML design files per screen, used as the source of truth during implementation
+- **Responsive:** Desktop-first with full mobile support (the Review PWA is mobile-first; the dashboard/settings are desktop-first)
+- **Screens to design in Stitch:**
+  - Post Review (mobile) — tabs per platform, inline editing, approve/reject
+  - Dashboard (desktop) — post history, performance metrics, upcoming scheduled posts
+  - Settings (desktop + mobile) — schedule config, platform toggles, Google Drive folder link
+  - "New Post" trigger (mobile) — manual pipeline kick-off
+
+---
+
+## Project Conventions
+
+- **GitHub:** Private repo at `github.com/<user>/prism`
+- **Deployment:** Vercel (connected to GitHub, auto-deploys on push to `main`)
+- **CLAUDE.md:** Lives at repo root. Updated after every completed feature. Tracks: current state, completed features, pending work, env vars needed, and n8n setup instructions.
+
+---
+
 ## Out of Scope (v1)
 
 - LinkedIn (add in v2 for carousels specifically)

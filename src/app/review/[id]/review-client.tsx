@@ -39,7 +39,7 @@ export function ReviewClient({ post, variants, filmNext }: ReviewClientProps) {
 
   const [scheduledAt, setScheduledAt] = useState<string>(
     post.scheduled_at
-      ? new Date(post.scheduled_at).toISOString().slice(0, 16)
+      ? isoToLocalDatetime(post.scheduled_at)
       : getDefaultSchedule(),
   )
 
@@ -47,7 +47,14 @@ export function ReviewClient({ post, variants, filmNext }: ReviewClientProps) {
     const d = new Date()
     d.setHours(18, 0, 0, 0)
     if (d < new Date()) d.setDate(d.getDate() + 1)
-    return d.toISOString().slice(0, 16)
+    const pad = (n: number) => String(n).padStart(2, '0')
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
+  }
+
+  function isoToLocalDatetime(iso: string): string {
+    const d = new Date(iso)
+    const pad = (n: number) => String(n).padStart(2, '0')
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
   }
 
   function localDatetimeToISO(localStr: string): string {

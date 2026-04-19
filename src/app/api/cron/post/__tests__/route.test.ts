@@ -20,7 +20,7 @@ const {
     builder.or = vi.fn().mockReturnValue(builder)
     builder.update = vi.fn().mockReturnValue(builder)
     // Default: returns empty data
-    builder.then = undefined
+    builder.then = vi.fn().mockResolvedValue({ data: [], error: null })
 
     // Make it thenable so `await supabase.from(...).select(...).eq(...)` works
     // We override per-test with .mockResolvedValueOnce on the last call in chain
