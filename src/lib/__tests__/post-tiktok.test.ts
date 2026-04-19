@@ -219,7 +219,7 @@ describe('postTikTok', () => {
       })
     })
 
-    it('returns success: false with skipped: true for 4xx with no error code but not ok', async () => {
+    it('returns success: false with skipped: true for 4xx with no error message but not ok', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: false,
         status: 400,
@@ -230,7 +230,7 @@ describe('postTikTok', () => {
 
       expect(result).toEqual({
         success: false,
-        error: 'TikTok API returned HTTP 400',
+        error: 'TikTok API error 400',
         skipped: true,
       })
     })

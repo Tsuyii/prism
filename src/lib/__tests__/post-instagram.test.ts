@@ -174,12 +174,15 @@ describe('postInstagram', () => {
   // ── Missing env var ───────────────────────────────────────────────────────
 
   describe('missing INSTAGRAM_BUSINESS_ACCOUNT_ID', () => {
-    it('throws a descriptive error when account id env var is not set', async () => {
+    it('returns success: false when account id env var is not set', async () => {
       delete process.env.INSTAGRAM_BUSINESS_ACCOUNT_ID
 
-      await expect(postInstagram(makeVariant())).rejects.toThrow(
-        'INSTAGRAM_BUSINESS_ACCOUNT_ID env var is not set',
-      )
+      const result = await postInstagram(makeVariant())
+
+      expect(result).toEqual({
+        success: false,
+        error: 'INSTAGRAM_BUSINESS_ACCOUNT_ID not set',
+      })
       expect(mockFetch).not.toHaveBeenCalled()
       expect(mockGetToken).not.toHaveBeenCalled()
     })

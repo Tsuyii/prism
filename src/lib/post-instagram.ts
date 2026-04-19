@@ -44,14 +44,12 @@ export const MAX_POLLS = 12
  * Returns { success: false, error } on failure or timeout.
  */
 export async function postInstagram(variant: InstagramVariant): Promise<InstagramResult> {
-  const accountId = process.env.INSTAGRAM_BUSINESS_ACCOUNT_ID
-  if (!accountId) {
-    throw new Error(
-      'INSTAGRAM_BUSINESS_ACCOUNT_ID env var is not set — cannot post to Instagram',
-    )
-  }
-
   try {
+    const accountId = process.env.INSTAGRAM_BUSINESS_ACCOUNT_ID
+    if (!accountId) {
+      throw new Error('INSTAGRAM_BUSINESS_ACCOUNT_ID not set')
+    }
+
     const token = await getToken('instagram')
 
     // Build caption string
