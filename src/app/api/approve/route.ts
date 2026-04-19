@@ -61,31 +61,5 @@ export async function POST(request: NextRequest) {
     console.error('[approve] Failed to mark variants approved:', variantsError)
   }
 
-  // Fire n8n posting webhook
-  if (process.env.N8N_WEBHOOK_URL) {
-    try {
-      const n8nPayload = {
-        postId,
-        scheduledAt: scheduledAt ?? null,
-        variants: post.post_variants,
-      }
-      const res = await fetch(process.env.N8N_WEBHOOK_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(process.env.N8N_API_KEY
-            ? { Authorization: `Bearer ${process.env.N8N_API_KEY}` }
-            : {}),
-        },
-        body: JSON.stringify(n8nPayload),
-      })
-      if (!res.ok) {
-        console.error('[approve] n8n webhook failed:', res.status, await res.text())
-      }
-    } catch (err) {
-      console.error('[approve] Failed to fire n8n webhook:', err)
-    }
-  }
-
   return NextResponse.json({ success: true, postId })
 }
