@@ -59,7 +59,8 @@ export async function postTikTok(variant: TikTokVariant): Promise<TikTokResult> 
 
     if (!res.ok) {
       const errorBody = await res.json().catch(() => null) as { error?: { message?: string } } | null
-      return { success: false, error: errorBody?.error?.message ?? `TikTok API error ${res.status}`, skipped: true }
+      const error = errorBody?.error?.message ?? `TikTok API error ${res.status}`
+      return { success: false, error, ...(res.status < 500 ? { skipped: true } : {}) }
     }
 
     const json = (await res.json()) as TikTokSuccessResponse

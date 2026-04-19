@@ -60,7 +60,10 @@ export async function postX(variant: {
       previousTweetId = response.data.id
     }
 
-    return { success: true, tweetId: firstTweetId! }
+    if (!firstTweetId) {
+      return { success: false, error: 'No tweets were posted' }
+    }
+    return { success: true, tweetId: firstTweetId }
   } catch (err: unknown) {
     const message =
       err instanceof Error ? err.message : typeof err === 'string' ? err : String(err)

@@ -15,10 +15,16 @@ vi.mock('@/lib/platform-tokens', () => ({
 const mockFetch = vi.fn()
 vi.stubGlobal('fetch', mockFetch)
 
-// ── Stub setTimeout so sleep() resolves instantly ────────────────────────────
-vi.stubGlobal('setTimeout', (fn: () => void) => { fn(); return 0 })
-
 import { postInstagram } from '@/lib/post-instagram'
+
+// ── Helper: run postInstagram while auto-advancing fake timers ────────────────
+// POLL_INTERVAL_MS=5000 so sleep() blocks on setTimeout; runAllTimersAsync
+// fires all pending timers repeatedly until the promise resolves.
+async function run(fn: () => Promise<unknown>) {
+  const promise = fn()
+  await vi.runAllTimersAsync()
+  return promise
+}
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -50,6 +56,7 @@ function mockResponse(body: unknown, ok = true, status = 200) {
 
 describe('postInstagram', () => {
   beforeEach(() => {
+    vi.useFakeTimers()
     vi.clearAllMocks()
     process.env.INSTAGRAM_BUSINESS_ACCOUNT_ID = 'acct-123'
     mockGetToken.mockResolvedValue('ig-access-token')
@@ -57,6 +64,7 @@ describe('postInstagram', () => {
 
   afterEach(() => {
     delete process.env.INSTAGRAM_BUSINESS_ACCOUNT_ID
+    vi.useRealTimers()
   })
 
   // ── Happy path ────────────────────────────────────────────────────────────
@@ -73,7 +81,7 @@ describe('postInstagram', () => {
         // 4. Publish
         .mockResolvedValueOnce(mockResponse({ id: 'media-xyz-789' }))
 
-      const result = await postInstagram(makeVariant())
+      const result = await run(() => postInstagram(makeVariant()))
 
       expect(result).toEqual({ success: true, mediaId: 'media-xyz-789' })
     })
@@ -84,7 +92,7 @@ describe('postInstagram', () => {
         .mockResolvedValueOnce(mockResponse({ status_code: 'FINISHED' }))
         .mockResolvedValueOnce(mockResponse({ id: 'media-1' }))
 
-      await postInstagram(makeVariant())
+      await run(() => postInstagram(makeVariant()))
 
       expect(mockGetToken).toHaveBeenCalledWith('instagram')
     })
@@ -95,12 +103,14 @@ describe('postInstagram', () => {
         .mockResolvedValueOnce(mockResponse({ status_code: 'FINISHED' }))
         .mockResolvedValueOnce(mockResponse({ id: 'media-2' }))
 
-      await postInstagram(
-        makeVariant({
-          caption: 'Hello world',
-          hashtags: ['#one', '#two'],
-          media_url: 'https://cdn.example.com/clip.mp4',
-        }),
+      await run(() =>
+        postInstagram(
+          makeVariant({
+            caption: 'Hello world',
+            hashtags: ['#one', '#two'],
+            media_url: 'https://cdn.example.com/clip.mp4',
+          }),
+        ),
       )
 
       const [url, options] = mockFetch.mock.calls[0] as [string, RequestInit]
@@ -122,7 +132,9 @@ describe('postInstagram', () => {
         .mockResolvedValueOnce(mockResponse({ status_code: 'FINISHED' }))
         .mockResolvedValueOnce(mockResponse({ id: 'm3' }))
 
-      await postInstagram(makeVariant({ caption: 'Just caption', hashtags: [] }))
+      await run(() =>
+        postInstagram(makeVariant({ caption: 'Just caption', hashtags: [] })),
+      )
 
       const body = JSON.parse(mockFetch.mock.calls[0][1].body as string) as {
         caption: string
@@ -136,8 +148,8 @@ describe('postInstagram', () => {
         .mockResolvedValueOnce(mockResponse({ status_code: 'FINISHED' }))
         .mockResolvedValueOnce(mockResponse({ id: 'm4' }))
 
-      const result = await postInstagram(
-        makeVariant({ caption: null, hashtags: null }),
+      const result = await run(() =>
+        postInstagram(makeVariant({ caption: null, hashtags: null })),
       )
 
       expect(result).toEqual({ success: true, mediaId: 'm4' })
@@ -153,7 +165,7 @@ describe('postInstagram', () => {
         .mockResolvedValueOnce(mockResponse({ status_code: 'FINISHED' }))
         .mockResolvedValueOnce(mockResponse({ id: 'final-media' }))
 
-      await postInstagram(makeVariant())
+      await run(() => postInstagram(makeVariant()))
 
       const [publishUrl, publishOptions] = mockFetch.mock.calls[2] as [
         string,
@@ -202,7 +214,7 @@ describe('postInstagram', () => {
         )
       }
 
-      const result = await postInstagram(makeVariant())
+      const result = await run(() => postInstagram(makeVariant()))
 
       expect(result).toEqual({
         success: false,
@@ -218,7 +230,7 @@ describe('postInstagram', () => {
         )
       }
 
-      await postInstagram(makeVariant())
+      await run(() => postInstagram(makeVariant()))
 
       // 1 container call + 12 poll calls = 13 total
       expect(mockFetch).toHaveBeenCalledTimes(13)
@@ -276,7 +288,7 @@ describe('postInstagram', () => {
         .mockResolvedValueOnce(mockResponse({ id: 'c-err' }))
         .mockResolvedValueOnce(mockResponse({ status_code: 'ERROR' }))
 
-      const result = await postInstagram(makeVariant())
+      const result = await run(() => postInstagram(makeVariant()))
 
       expect(result).toEqual({
         success: false,
@@ -289,7 +301,7 @@ describe('postInstagram', () => {
         .mockResolvedValueOnce(mockResponse({ id: 'c-exp' }))
         .mockResolvedValueOnce(mockResponse({ status_code: 'EXPIRED' }))
 
-      const result = await postInstagram(makeVariant())
+      const result = await run(() => postInstagram(makeVariant()))
 
       expect(result).toEqual({
         success: false,

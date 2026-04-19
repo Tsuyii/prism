@@ -88,7 +88,8 @@ export async function postInstagram(variant: InstagramVariant): Promise<Instagra
       pollsRemaining--
 
       const statusRes = await fetch(
-        `https://graph.facebook.com/v21.0/${creationId}?fields=status_code&access_token=${token}`,
+        `https://graph.facebook.com/v21.0/${creationId}?fields=status_code`,
+        { headers: { Authorization: `Bearer ${token}` } },
       )
 
       const statusJson = (await statusRes.json()) as StatusResponse
