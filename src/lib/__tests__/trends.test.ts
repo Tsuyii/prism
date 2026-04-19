@@ -5,7 +5,8 @@ const mockFetch = vi.fn()
 vi.stubGlobal('fetch', mockFetch)
 
 vi.mock('@anthropic-ai/sdk', () => {
-  const parseMock = vi.fn().mockResolvedValue({
+  let parseMock: ReturnType<typeof vi.fn>
+  parseMock = vi.fn().mockResolvedValue({
     parsed_output: {
       scored_topics: [
         { topic: 'CapCut speed ramp tutorial', score: 88, source: 'youtube' },
@@ -17,8 +18,8 @@ vi.mock('@anthropic-ai/sdk', () => {
     },
     stop_reason: 'end_turn',
   })
-  function MockAnthropic() {
-    return { messages: { parse: parseMock } }
+  class MockAnthropic {
+    messages = { parse: parseMock }
   }
   return { default: MockAnthropic }
 })
@@ -100,6 +101,7 @@ describe('scoreTrendsWithClaude', () => {
     expect(result.scored_topics).toHaveLength(2)
     expect(result.claude_topics).toHaveLength(1)
     expect(result.scored_topics[0].score).toBe(88)
+    expect(result.scored_topics[0].raw_data).toMatchObject({ videoId: 'abc123' })
     expect(result.claude_topics[0].source).toBe('claude')
     expect(result.claude_topics[0].raw_data).toMatchObject({ rationale: expect.any(String) })
   })

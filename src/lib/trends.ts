@@ -85,35 +85,29 @@ export async function fetchYouTubeTrends(apiKey: string): Promise<RawTrend[]> {
 const SUBREDDITS = ['videoediting', 'premiere', 'capcut', 'davinciresolve', 'AfterEffects']
 
 export async function fetchRedditTrends(): Promise<RawTrend[]> {
-  const results: RawTrend[] = []
-
-  for (const sub of SUBREDDITS) {
-    try {
+  const settled = await Promise.allSettled(
+    SUBREDDITS.map(async (sub) => {
       const res = await fetch(`https://www.reddit.com/r/${sub}/hot.json?limit=5`, {
         headers: { 'User-Agent': 'prism-research-cron/1.0' },
       })
-      if (!res.ok) continue
+      if (!res.ok) return []
       const data = await res.json()
-      for (const { data: post } of (data.data?.children ?? []) as Array<{
+      return (data.data?.children ?? []).map(({ data: post }: {
         data: { title: string; ups: number; num_comments: number; permalink: string }
-      }>) {
-        results.push({
-          topic: post.title,
-          source: 'reddit',
-          raw_data: {
-            subreddit: sub,
-            ups: post.ups,
-            num_comments: post.num_comments,
-            permalink: `https://reddit.com${post.permalink}`,
-          },
-        })
-      }
-    } catch (err) {
-      console.warn(`[trends] Reddit r/${sub} error:`, err)
-    }
-  }
+      }) => ({
+        topic: post.title,
+        source: 'reddit' as const,
+        raw_data: {
+          subreddit: sub,
+          ups: post.ups,
+          num_comments: post.num_comments,
+          permalink: `https://reddit.com${post.permalink}`,
+        },
+      }))
+    }),
+  )
 
-  return results
+  return settled.flatMap((result) => (result.status === 'fulfilled' ? result.value : []))
 }
 
 // ─── Claude scorer ────────────────────────────────────────────────────────────
@@ -150,13 +144,13 @@ export async function scoreTrendsWithClaude(raw: RawTrend[]): Promise<{
 
   if (!response.parsed_output) throw new Error('Claude returned no scored output')
 
-  const rawByIndex = new Map(raw.map((t, i) => [i, t]))
+  const rawByTopic = new Map(raw.map((t) => [t.topic, t]))
 
-  const scored_topics: ScoredTrend[] = response.parsed_output.scored_topics.map((t, i) => ({
+  const scored_topics: ScoredTrend[] = response.parsed_output.scored_topics.map((t) => ({
     topic: t.topic,
     score: t.score,
     source: t.source,
-    raw_data: rawByIndex.get(i)?.raw_data ?? {},
+    raw_data: rawByTopic.get(t.topic)?.raw_data ?? {},
   }))
 
   const claude_topics: ScoredTrend[] = response.parsed_output.claude_topics.map((t) => ({
