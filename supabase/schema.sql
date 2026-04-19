@@ -39,7 +39,7 @@ create table if not exists performance (
 create table if not exists niche_trends (
   id uuid primary key default gen_random_uuid(),
   source text not null
-    check (source in ('youtube', 'reddit', 'tiktok', 'google_trends')),
+    check (source in ('youtube', 'reddit', 'tiktok', 'google_trends', 'claude')),
   topic text not null,
   score numeric,
   raw_data jsonb,
