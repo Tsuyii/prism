@@ -1,40 +1,27 @@
 import { createServiceClient } from '@/lib/supabase/server'
 
-type Platform = 'instagram' | 'tiktok' | 'x'
+export type Platform = 'instagram' | 'tiktok'
 
 const ENV_VAR_MAP: Record<Platform, string> = {
   instagram: 'INSTAGRAM_ACCESS_TOKEN',
   tiktok: 'TIKTOK_ACCESS_TOKEN',
-  x: 'X_ACCESS_TOKEN',
 }
 
-/** Days before expiry that triggers a proactive token refresh. */
-const REFRESH_THRESHOLD_DAYS = 7
+/** Milliseconds before expiry at which a proactive refresh is triggered, per platform. */
+const REFRESH_THRESHOLD_MS: Record<Platform, number> = {
+  instagram: 7 * 24 * 60 * 60 * 1000, // 7 days
+  tiktok: 60 * 60 * 1000, // 1 hour before expiry
+}
 
-function isExpiringSoon(expiresAt: Date): boolean {
-  const thresholdMs = REFRESH_THRESHOLD_DAYS * 24 * 60 * 60 * 1000
-  return expiresAt.getTime() - Date.now() <= thresholdMs
+function isExpiringSoon(platform: Platform, expiresAt: Date): boolean {
+  return expiresAt.getTime() - Date.now() <= REFRESH_THRESHOLD_MS[platform]
 }
 
 /**
  * Refresh a platform token using the platform's OAuth refresh flow.
- * X (OAuth 1.0a) tokens never expire — calling this for X throws.
  */
-async function refreshToken(platform: 'instagram' | 'tiktok' | 'x'): Promise<string> {
-  if (platform === 'x') {
-    throw new Error('X tokens use OAuth 1.0a and do not expire — manual rotation required')
-  }
-
+async function refreshToken(platform: Platform): Promise<string> {
   if (platform === 'instagram') {
-    const appId = process.env.INSTAGRAM_APP_ID
-    const appSecret = process.env.INSTAGRAM_APP_SECRET
-
-    if (!appId || !appSecret) {
-      throw new Error(
-        'Cannot refresh Instagram token: INSTAGRAM_APP_ID or INSTAGRAM_APP_SECRET not set',
-      )
-    }
-
     const supabase = createServiceClient()
     const { data: row } = await supabase
       .from('platform_tokens')
@@ -47,10 +34,8 @@ async function refreshToken(platform: 'instagram' | 'tiktok' | 'x'): Promise<str
     }
 
     const url = new URL('https://graph.facebook.com/v21.0/oauth/access_token')
-    url.searchParams.set('grant_type', 'fb_exchange_token')
-    url.searchParams.set('client_id', appId)
-    url.searchParams.set('client_secret', appSecret)
-    url.searchParams.set('fb_exchange_token', row.access_token)
+    url.searchParams.set('grant_type', 'ig_refresh_token')
+    url.searchParams.set('access_token', row.access_token)
 
     const res = await fetch(url.toString())
     if (!res.ok) {
@@ -149,7 +134,7 @@ export async function saveToken(
  * Get the access token for a platform.
  *
  * - If no DB row exists: seeds from the corresponding env var and inserts it.
- * - If the token expires within 7 days: triggers a refresh (Instagram / TikTok only).
+ * - If the token expires within the platform threshold: triggers a refresh.
  * - Returns the current access_token.
  */
 export async function getToken(platform: Platform): Promise<string> {
@@ -166,9 +151,7 @@ export async function getToken(platform: Platform): Promise<string> {
     const envVar = ENV_VAR_MAP[platform]
     const token = process.env[envVar]
     if (!token) {
-      throw new Error(
-        `No token for ${platform} and ${envVar} env var not set`,
-      )
+      throw new Error(`No token for ${platform} and ${envVar} env var not set`)
     }
     await saveToken(platform, token)
     return token
@@ -177,10 +160,32 @@ export async function getToken(platform: Platform): Promise<string> {
   // Row exists — check expiry
   if (row.expires_at) {
     const expiresAt = new Date(row.expires_at)
-    if (isExpiringSoon(expiresAt)) {
+    if (isExpiringSoon(platform, expiresAt)) {
       return await refreshToken(platform)
     }
   }
 
   return row.access_token
+}
+
+/**
+ * Get X (Twitter) OAuth 1.0a credentials directly from env vars.
+ * X tokens never expire, so no DB storage is needed.
+ */
+export function getXCredentials(): {
+  apiKey: string
+  apiSecret: string
+  accessToken: string
+  accessTokenSecret: string
+} {
+  const apiKey = process.env.X_API_KEY
+  const apiSecret = process.env.X_API_SECRET
+  const accessToken = process.env.X_ACCESS_TOKEN
+  const accessTokenSecret = process.env.X_ACCESS_TOKEN_SECRET
+  if (!apiKey || !apiSecret || !accessToken || !accessTokenSecret) {
+    throw new Error(
+      'X credentials not set: X_API_KEY, X_API_SECRET, X_ACCESS_TOKEN, X_ACCESS_TOKEN_SECRET required',
+    )
+  }
+  return { apiKey, apiSecret, accessToken, accessTokenSecret }
 }

@@ -41,7 +41,7 @@ vi.stubGlobal('fetch', mockFetch)
 
 // ── Import after mocks are set up ─────────────────────────────────────────────
 
-import { getToken, saveToken } from '@/lib/platform-tokens'
+import { getToken, saveToken, getXCredentials } from '@/lib/platform-tokens'
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
@@ -53,11 +53,12 @@ describe('platform-tokens', () => {
     // Reset env vars
     delete process.env.INSTAGRAM_ACCESS_TOKEN
     delete process.env.TIKTOK_ACCESS_TOKEN
-    delete process.env.X_ACCESS_TOKEN
-    delete process.env.INSTAGRAM_APP_ID
-    delete process.env.INSTAGRAM_APP_SECRET
     delete process.env.TIKTOK_CLIENT_KEY
     delete process.env.TIKTOK_CLIENT_SECRET
+    delete process.env.X_API_KEY
+    delete process.env.X_API_SECRET
+    delete process.env.X_ACCESS_TOKEN
+    delete process.env.X_ACCESS_TOKEN_SECRET
   })
 
   // ── getToken: seed from env ─────────────────────────────────────────────────
@@ -83,14 +84,6 @@ describe('platform-tokens', () => {
 
       const token = await getToken('tiktok')
       expect(token).toBe('tt-token-from-env')
-    })
-
-    it('returns the env var token for x', async () => {
-      mockRow = null
-      process.env.X_ACCESS_TOKEN = 'x-token-from-env'
-
-      const token = await getToken('x')
-      expect(token).toBe('x-token-from-env')
     })
 
     it('throws a descriptive error when no DB row and env var not set', async () => {
@@ -119,7 +112,7 @@ describe('platform-tokens', () => {
       expect(mockFetch).not.toHaveBeenCalled()
     })
 
-    it('returns access_token from DB row when expiry is far in the future', async () => {
+    it('returns access_token from DB row when expiry is far in the future (instagram)', async () => {
       const farFuture = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() // +30 days
       mockRow = {
         access_token: 'ig-db-token-fresh',
@@ -132,34 +125,30 @@ describe('platform-tokens', () => {
       expect(mockFetch).not.toHaveBeenCalled()
     })
 
-    it('throws when x token is near expiry because X uses OAuth 1.0a and cannot be refreshed', async () => {
-      const nearExpiry = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString() // +3 days
+    it('returns tiktok token when expiry is more than 1 hour away', async () => {
+      const notSoon = new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString() // +2 hours
       mockRow = {
-        access_token: 'x-db-token',
+        access_token: 'tt-db-token-fresh',
         refresh_token: null,
-        expires_at: nearExpiry,
+        expires_at: notSoon,
       }
 
-      await expect(getToken('x')).rejects.toThrow(
-        'X tokens use OAuth 1.0a and do not expire — manual rotation required',
-      )
+      const token = await getToken('tiktok')
+      expect(token).toBe('tt-db-token-fresh')
       expect(mockFetch).not.toHaveBeenCalled()
     })
   })
 
   // ── getToken: triggers refresh when expiring soon ───────────────────────────
 
-  describe('getToken — triggers refresh when expires_at within 7 days', () => {
-    it('calls Instagram Graph API and returns refreshed token', async () => {
+  describe('getToken — triggers refresh when expires_at within threshold', () => {
+    it('calls Instagram refresh endpoint (ig_refresh_token) and returns refreshed token', async () => {
       const soonExpiry = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString() // +2 days
       mockRow = {
         access_token: 'ig-old-token',
         refresh_token: null,
         expires_at: soonExpiry,
       }
-
-      process.env.INSTAGRAM_APP_ID = 'test-app-id'
-      process.env.INSTAGRAM_APP_SECRET = 'test-app-secret'
 
       mockFetch.mockResolvedValueOnce({
         ok: true,
@@ -169,20 +158,21 @@ describe('platform-tokens', () => {
       const token = await getToken('instagram')
       expect(token).toBe('ig-refreshed-token')
 
-      // Verify the correct endpoint was called
+      // Verify the correct endpoint was called (ig_refresh_token, not fb_exchange_token)
       expect(mockFetch).toHaveBeenCalledWith(
         expect.stringContaining('graph.facebook.com/v21.0/oauth/access_token'),
       )
       expect(mockFetch).toHaveBeenCalledWith(
-        expect.stringContaining('grant_type=fb_exchange_token'),
+        expect.stringContaining('grant_type=ig_refresh_token'),
       )
-      expect(mockFetch).toHaveBeenCalledWith(
-        expect.stringContaining('client_id=test-app-id'),
+      // Should NOT use app id/secret
+      expect(mockFetch).not.toHaveBeenCalledWith(
+        expect.stringContaining('client_id='),
       )
     })
 
-    it('calls TikTok OAuth endpoint and returns refreshed token', async () => {
-      const soonExpiry = new Date(Date.now() + 1 * 60 * 60 * 1000).toISOString() // +1 hour
+    it('calls TikTok OAuth endpoint and returns refreshed token (within 1 hour)', async () => {
+      const soonExpiry = new Date(Date.now() + 30 * 60 * 1000).toISOString() // +30 minutes
       mockRow = {
         access_token: 'tt-old-token',
         refresh_token: 'tt-refresh-token',
@@ -208,6 +198,19 @@ describe('platform-tokens', () => {
       )
     })
 
+    it('does NOT refresh tiktok token expiring in more than 1 hour', async () => {
+      const notSoon = new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString() // +2 hours
+      mockRow = {
+        access_token: 'tt-db-token',
+        refresh_token: 'tt-refresh',
+        expires_at: notSoon,
+      }
+
+      const token = await getToken('tiktok')
+      expect(token).toBe('tt-db-token')
+      expect(mockFetch).not.toHaveBeenCalled()
+    })
+
     it('throws when Instagram refresh API returns no access_token', async () => {
       const soonExpiry = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString()
       mockRow = {
@@ -215,9 +218,6 @@ describe('platform-tokens', () => {
         refresh_token: null,
         expires_at: soonExpiry,
       }
-
-      process.env.INSTAGRAM_APP_ID = 'test-app-id'
-      process.env.INSTAGRAM_APP_SECRET = 'test-app-secret'
 
       mockFetch.mockResolvedValueOnce({
         ok: true,
@@ -228,32 +228,18 @@ describe('platform-tokens', () => {
         'Instagram token refresh failed: no access_token in response',
       )
     })
-
-    it('throws when Instagram env vars for refresh are missing', async () => {
-      const soonExpiry = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString()
-      mockRow = {
-        access_token: 'ig-old-token',
-        refresh_token: null,
-        expires_at: soonExpiry,
-      }
-      // INSTAGRAM_APP_ID / INSTAGRAM_APP_SECRET not set
-
-      await expect(getToken('instagram')).rejects.toThrow(
-        'INSTAGRAM_APP_ID or INSTAGRAM_APP_SECRET not set',
-      )
-    })
   })
 
   // ── saveToken ────────────────────────────────────────────────────────────────
 
   describe('saveToken', () => {
     it('upserts platform, access_token with no optional fields', async () => {
-      await saveToken('x', 'x-access-token')
+      await saveToken('instagram', 'ig-access-token')
 
       expect(mockUpsert).toHaveBeenCalledWith(
         {
-          platform: 'x',
-          access_token: 'x-access-token',
+          platform: 'instagram',
+          access_token: 'ig-access-token',
           refresh_token: null,
           expires_at: null,
         },
@@ -281,6 +267,48 @@ describe('platform-tokens', () => {
 
       await expect(saveToken('instagram', 'bad-token')).rejects.toThrow(
         'Failed to save token for instagram',
+      )
+    })
+  })
+
+  // ── getXCredentials ──────────────────────────────────────────────────────────
+
+  describe('getXCredentials', () => {
+    it('returns all 4 credentials from env vars', () => {
+      process.env.X_API_KEY = 'test-api-key'
+      process.env.X_API_SECRET = 'test-api-secret'
+      process.env.X_ACCESS_TOKEN = 'test-access-token'
+      process.env.X_ACCESS_TOKEN_SECRET = 'test-access-token-secret'
+
+      const creds = getXCredentials()
+
+      expect(creds).toEqual({
+        apiKey: 'test-api-key',
+        apiSecret: 'test-api-secret',
+        accessToken: 'test-access-token',
+        accessTokenSecret: 'test-access-token-secret',
+      })
+    })
+
+    it('throws when X_API_KEY is missing', () => {
+      process.env.X_API_SECRET = 'test-api-secret'
+      process.env.X_ACCESS_TOKEN = 'test-access-token'
+      process.env.X_ACCESS_TOKEN_SECRET = 'test-access-token-secret'
+      // X_API_KEY not set
+
+      expect(() => getXCredentials()).toThrow(
+        'X credentials not set: X_API_KEY, X_API_SECRET, X_ACCESS_TOKEN, X_ACCESS_TOKEN_SECRET required',
+      )
+    })
+
+    it('throws when X_ACCESS_TOKEN_SECRET is missing', () => {
+      process.env.X_API_KEY = 'test-api-key'
+      process.env.X_API_SECRET = 'test-api-secret'
+      process.env.X_ACCESS_TOKEN = 'test-access-token'
+      // X_ACCESS_TOKEN_SECRET not set
+
+      expect(() => getXCredentials()).toThrow(
+        'X credentials not set: X_API_KEY, X_API_SECRET, X_ACCESS_TOKEN, X_ACCESS_TOKEN_SECRET required',
       )
     })
   })
