@@ -41,28 +41,41 @@ prism/
 │   └── superpowers/specs/
 │       └── 2026-04-16-prism-design.md
 ├── src/
-│   └── app/                           ← Next.js App Router
-│       ├── page.tsx                   ← Dashboard
-│       ├── review/[id]/page.tsx       ← Post Review (mobile PWA)
-│       ├── settings/page.tsx          ← Schedule + platform config
-│       ├── api/
-│       │   ├── pipeline/route.ts      ← Claude AI pipeline (webhook entry)
-│       │   ├── approve/route.ts       ← Approve post → trigger n8n
-│       │   ├── reject/route.ts        ← Reject post
-│       │   ├── cron/
-│       │   │   ├── research/route.ts  ← Weekly trend research cron
-│       │   │   └── metrics/route.ts   ← Daily performance pull cron
-│       │   └── webhook/n8n/route.ts   ← Receive n8n status callbacks
-├── lib/
-│   ├── supabase.ts
-│   ├── claude.ts                      ← Claude API calls
-│   ├── drive.ts                       ← Google Drive OAuth + file reads
-│   └── research/
-│       ├── youtube.ts
-│       ├── reddit.ts                  ← PRAW via n8n Python node
-│       └── tiktok.ts
+│   ├── app/                           ← Next.js App Router
+│   │   ├── page.tsx                   ← Dashboard
+│   │   ├── review/[id]/page.tsx       ← Post Review (mobile PWA)
+│   │   ├── settings/page.tsx          ← Schedule + platform config
+│   │   ├── new/page.tsx               ← Manual pipeline trigger
+│   │   └── api/
+│   │       ├── pipeline/route.ts      ← Claude AI pipeline (webhook entry)
+│   │       ├── approve/route.ts       ← Approve post → trigger n8n
+│   │       ├── reject/route.ts        ← Reject post
+│   │       ├── settings/route.ts      ← PATCH schedule config
+│   │       ├── push/
+│   │       │   └── subscribe/route.ts ← POST/DELETE push subscriptions
+│   │       ├── cron/
+│   │       │   ├── research/route.ts  ← Weekly trend research cron (TODO)
+│   │       │   └── metrics/route.ts   ← Daily performance pull cron (TODO)
+│   │       └── webhook/n8n/route.ts   ← Receive n8n status callbacks
+│   ├── components/
+│   │   ├── nav.tsx                    ← Shared bottom nav / sidebar
+│   │   ├── post-card.tsx              ← Post list card
+│   │   └── push-bell.tsx              ← Bell icon subscribe/unsubscribe button
+│   ├── hooks/
+│   │   └── usePushSubscription.ts     ← Web Push subscribe/unsubscribe hook
+│   └── lib/
+│       ├── supabase/
+│       │   ├── client.ts              ← Browser Supabase client
+│       │   ├── server.ts              ← Server Supabase client (service role)
+│       │   └── types.ts               ← Generated + legacy type aliases
+│       ├── claude.ts                  ← Claude API content generation
+│       ├── drive.ts                   ← Google Drive service account download
+│       ├── whisper.ts                 ← OpenAI Whisper transcription
+│       ├── push.ts                    ← Web Push sendPushToAll() utility
+│       └── utils.ts                   ← cn, formatScheduledTime, platformLabel
 └── public/
-    └── manifest.json                  ← PWA manifest
+    ├── manifest.json                  ← PWA manifest
+    └── sw.js                          ← Service worker (cache + push handler)
 ```
 
 ---
@@ -164,11 +177,19 @@ create table performance (
 
 create table niche_trends (
   id uuid primary key default gen_random_uuid(),
-  source text not null,                            -- youtube | reddit | tiktok | google_trends
+  source text not null,                            -- youtube | reddit | tiktok | google_trends | claude
   topic text not null,
   score numeric,
   raw_data jsonb,
   fetched_at timestamptz default now()
+);
+
+create table push_subscriptions (
+  id uuid primary key default gen_random_uuid(),
+  endpoint text not null unique,
+  p256dh text not null,
+  auth text not null,
+  created_at timestamptz default now()
 );
 
 create table schedule_config (
@@ -249,9 +270,27 @@ After each task passes spec + code quality review, commit and push directly to m
 
 ---
 
+## Design Variants (pending selection)
+
+Generated 6 Stitch variants on 2026-04-19 — awaiting user pick before implementing:
+
+**Review Post (Mobile):**
+- Variant A: Cyber-Editorial — true black, violet outer glows, glass tabs, violet-to-emerald Approve button
+- Variant B: Atmospheric Immersion — violet nebula backgrounds, glassmorphism, floating oversized Approve
+- Variant C: Bold Brutalist — neon-violet on true black, ultra-large lead caption, radial Approve hero
+
+**Dashboard (Desktop):**
+- Variant D: Editorial Powerhouse — wide glassmorphic sidebar, hero-sized gradient stats, magazine post cards
+- Variant E: Command Center — 3-panel split (sidebar / stage / feed), obsidian + dark orchid tonal layers
+- Variant F: Modern Minimalist Studio — top nav, 3-column post grid, vertical violet Pulse stats bar
+
+View in Stitch project `12320735979743494453` and tell Claude which variant(s) to implement.
+
+---
+
 ## In Progress
 
-_Plan 5: Research tab + weekly spy cron — not yet written._
+_Design variant selection pending. Plan 5: Research tab + weekly spy cron — not yet written._
 
 ---
 
