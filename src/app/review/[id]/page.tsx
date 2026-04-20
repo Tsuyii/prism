@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { ReviewClient, PLATFORMS } from './review-client'
+import { ReviewClient } from './review-client'
 
 export default async function ReviewPage({
   params,
@@ -24,7 +24,6 @@ export default async function ReviewPage({
     .from('post_variants')
     .select('*')
     .eq('post_id', id)
-    .in('platform', PLATFORMS)
 
   // Fetch latest film_next recommendation for this post
   const { data: filmNextRow } = await supabase

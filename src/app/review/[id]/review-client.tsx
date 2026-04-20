@@ -2,11 +2,11 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { cn, platformLabel } from '@/lib/utils'
+import { cn, platformLabel, PLATFORMS } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
 import type { Post, PostVariant, Platform } from '@/lib/supabase/types'
 
-export const PLATFORMS: Platform[] = ['instagram', 'tiktok', 'x_thread', 'x_video']
+export { PLATFORMS }
 
 interface ReviewClientProps {
   post: Post

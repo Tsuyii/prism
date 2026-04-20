@@ -11,6 +11,8 @@ export function formatScheduledTime(iso: string | null): string {
   return new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 }
 
+export const PLATFORMS: Platform[] = ['instagram', 'tiktok', 'x_thread', 'x_video']
+
 export function platformLabel(platform: Platform): string {
   const labels: Record<Platform, string> = {
     instagram: 'Instagram',
