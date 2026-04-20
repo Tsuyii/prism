@@ -298,7 +298,7 @@ View in Stitch project `12320735979743494453` and tell Claude which variant(s) t
 
 ## In Progress
 
-_Design variant selection pending. Plan 6: Metrics tab + daily performance pull — not yet written._
+_Env var setup in progress. Social platform keys (Instagram, TikTok, X) still needed before posting works. Core pipeline (Drive → Whisper → Claude → review) is fully configured and ready to test._
 
 ---
 
