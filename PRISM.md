@@ -230,6 +230,7 @@ After each task passes spec + code quality review, commit and push directly to m
 | Plan 5: Research tab + spy cron | `docs/superpowers/plans/2026-04-19-plan-5-research-cron.md` | Complete |
 | Plan 6: Direct platform posting (replace Blotato) | `docs/superpowers/plans/2026-04-19-plan-6-direct-posting.md` | Complete |
 | Plan 7: Metrics tab + performance loop | TBD | Not written yet |
+| Plan 8: UI Polish | TBD | Not written yet |
 
 ---
 
@@ -280,25 +281,129 @@ After each task passes spec + code quality review, commit and push directly to m
 
 ## Design Variants (pending selection)
 
-Generated 6 Stitch variants on 2026-04-19 — awaiting user pick before implementing:
+All screens live in Stitch project `12320735979743494453`. Tell Claude which to implement.
 
-**Review Post (Mobile):**
-- Variant A: Cyber-Editorial — true black, violet outer glows, glass tabs, violet-to-emerald Approve button
-- Variant B: Atmospheric Immersion — violet nebula backgrounds, glassmorphism, floating oversized Approve
-- Variant C: Bold Brutalist — neon-violet on true black, ultra-large lead caption, radial Approve hero
+---
 
-**Dashboard (Desktop):**
-- Variant D: Editorial Powerhouse — wide glassmorphic sidebar, hero-sized gradient stats, magazine post cards
-- Variant E: Command Center — 3-panel split (sidebar / stage / feed), obsidian + dark orchid tonal layers
-- Variant F: Modern Minimalist Studio — top nav, 3-column post grid, vertical violet Pulse stats bar
+### Dashboard — Desktop (14 variants)
 
-View in Stitch project `12320735979743494453` and tell Claude which variant(s) to implement.
+| # | Screen ID | Style |
+|---|-----------|-------|
+| D1 | `e784ffd0a1c34c6ead7ea01c71b47181` | Editorial Powerhouse — wide sidebar, hero stats, magazine cards |
+| D2 | `b0d3f2a23f0d4f438cfe8bde5ea5ae13` | Command Center — 3-panel split, obsidian + dark orchid layers |
+| D3 | `346541e07e594a1ba10ea908b9fe3779` | Modern Minimalist Studio — top nav, 3-col grid, violet Pulse bar |
+| D4 | `614187a3eea3452fb211171940848f96` | Base Dashboard Desktop |
+| D5 | `0c05ccd466bf4f8291e056aada4551dc` | Cinematic Command — horizontal filmstrip queue, oversized stats |
+| D6 | `3ad9fc08ab184518a4a2599447de7f35` | Multi-Channel Orchestrator — 3 vertical platform lanes |
+| D7 | `67e90c4b98594b14bb18ab1a67db8cbe` | Editorial Minimalism — centered timeline, ticker stats bar |
+| D8 | `edde7d49bafe4bd0b1ff3d02a1dd1e0c` | Visual Bento — immersive card grid, media blurs |
+| D9 | `13c996b39ef44d23a18353d80ba6c1bd` | Split-Screen Workspace — 30% insights panel + 70% feed |
+| D10 | `386aad37ec754d2c910d4bffec17073a` | Midnight Editorial Gallery — dynamic masonry grid |
+| D11 | `837a1953c6ad471a8bde61217394d749` | Cinematic Focus — full-bleed hero post + slim right queue |
+| D12 | `161d169aa6d642d9bbd9dc8b70aaef26` | Terminal Noir — command-line monochrome, violet accents only |
+| D13 | `5ff2995425b740279ca2a8640d8eddb1` | Temporal Flow — horizontal timeline + vertical content queue |
+| D14 | `3af7db2e01bb4efb9c16fb18b2ea46b1` | Impact-First — giant typographic stats top half |
+
+---
+
+### Dashboard — Mobile (10 variants)
+
+| # | Screen ID | Style |
+|---|-----------|-------|
+| M1 | `e2e06a38476a4154aec4e1b80cf0c074` | Base Mobile Dashboard — stats strip, post queue, FAB |
+| M2 | `8945a3c883a04753bd2fa5e8412338c2` | Review Deck — swipeable full-screen card stack |
+| M3 | `9fd0cb8055f54bc498c27e2cca8d6725` | Data-Dense Utility — compact neon-dot rows, pull-to-reveal stats |
+| M4 | `bda8e426aa6f4dac8c472a6d4af7d5fe` | Cinematic Spotlight — full-bleed hero + draggable bottom sheet |
+| M5 | `6b47c0a4aa1c4e17bfcc69f0012c764c` | Timeline-First — week-strip calendar + chronological queue |
+| M6 | `ae440e1dc48946969a8b3cedfd38d3ee` | Task-Centric Launcher — 2×2 action grid with glowing stats |
+| M7 | `10bf43404a7d4e8187463d982e0d0c2f` | Split-Screen Analytical — stats chart top / card carousel bottom |
+| M8 | `2a278dedc96a46e993ba0886b07f9020` | Grouped Notification Feed — inbox grouped by platform |
+| M9 | `77985a88c2c442b182049a33e95b2451` | Glassmorphic Card Grid — 2-col translucent grid |
+| M10 | `9ffba1c648eb455595327b807dcf1fb5` | Platform Status Board — full-width color-coded platform rows |
+
+---
+
+### Review Post — Mobile (4 variants)
+
+| # | Screen ID | Style |
+|---|-----------|-------|
+| R1 | `e494fbaba2914a709b0fe61c25afbb16` | Base Review Post Mobile |
+| R2 | `27b118b65caf4a0b8b72be4f4510cd2e` | Atmospheric Immersion — violet nebula, glassmorphism, floating Approve |
+| R3 | `821cbf7de07a48cca238cada40d427f9` | Cyber-Editorial — true black, violet glows, glass tabs |
+| R4 | `4b07d05db25c419eae2c46071d3757e6` | Bold Brutalist — neon-violet, ultra-large caption, radial Approve |
+
+---
+
+### Settings — Desktop (6 variants)
+
+| # | Screen ID | Style |
+|---|-----------|-------|
+| SD1 | `1d0919d5e6184cec8bbd937ea995c6f8` | Base Settings Desktop |
+| SD2 | `6227a7a3adba4218aada0e11a41c7e6c` | Full-bleed horizontal timeline visualizer, glassmorphic energy orbs |
+| SD3 | `f52a734330bc4852914b4d3df5f2d3db` | Asymmetric Command Center — masonry grid + floating glass sidebar |
+| SD4 | `c2e9a51fc8714535acb02772f32f2a7c` | Focused Card Stack — expandable overlapping day deck |
+| SD5 | `fd1c76186ab84b7b84e840ce4f64b646` | Bento Box Matrix — glass containers of varying sizes |
+| SD6 | `b4b8c9a49b144f9e9ca2a26713167c2f` | Typography-First — massive glowing day labels, luxury editorial |
+
+---
+
+### Settings — Mobile (6 variants)
+
+| # | Screen ID | Style |
+|---|-----------|-------|
+| SM1 | `e042ac2170d74d63a3317d42f2cc1cbe` | Base Settings Mobile |
+| SM2 | `e1b6be836eec4248b125a591cea1166d` | Full-Screen Weekly Heat-Map — 24h × 7 day glassmorphic grid |
+| SM3 | `89f1d14a57234d6db5b73ef238652abe` | Gesture Picker — floating day pills + circular time dial bottom sheet |
+| SM4 | `2adb9080212c43f9a91d8d99ecb7e61c` | Magazine Editorial — oversized serif day labels, flowing layout |
+| SM5 | `b15e1269ebc24cf9bb7f05a03f61d171` | Neon-Minimalist — pure black canvas, glowing toggles, monospace |
+| SM6 | `d1f2f8c1088b4448a8bc15b4d7b0d27c` | Spotify-Style — scrollable rounded preference cards |
+
+---
+
+### New Post — Mobile (1 variant)
+
+| # | Screen ID | Style |
+|---|-----------|-------|
+| NP1 | `2c7f68a8c42e48a1a58e6a1c8224bace` | Base New Post Mobile |
+
+---
+
+## Session Progress (2026-04-21)
+
+### Bugs fixed
+- `PLATFORMS` exported from `'use client'` file and imported in server component → moved to `lib/utils.ts`, removed `.in()` filter from server query
+- `PIPELINE_SECRET` had quotes + `\n` in `.env.local` → cleaned up, added `NEXT_PUBLIC_PIPELINE_SECRET` to Vercel
+- `CRON_SECRET` had whitespace in Vercel env → removed and re-added clean
+- Cron schedule `*/15 * * * *` blocked Hobby plan deploy → changed to `0 9 * * *`
+- Approve/Reject buttons fixed at bottom overlapping video → moved inline into scroll flow
+
+### Features added
+- Google Drive video embedded in review page via `/preview` iframe
+- Full end-to-end pipeline tested and working on Vercel: Drive URL → Whisper → Claude → review page
+
+### Env vars status
+- `SUPABASE_SERVICE_ROLE_KEY`, `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `GOOGLE_SERVICE_ACCOUNT_KEY`, `GOOGLE_DRIVE_FOLDER_ID`, `PIPELINE_SECRET`, `NEXT_PUBLIC_PIPELINE_SECRET`, `CRON_SECRET` — all set locally and on Vercel
+- Still missing: `INSTAGRAM_ACCESS_TOKEN`, `INSTAGRAM_BUSINESS_ACCOUNT_ID`, `TIKTOK_*`, `X_*`, `YOUTUBE_API_KEY`, `PERPLEXITY_API_KEY`
+
+---
+
+## Next Session — Intelligence Upgrade
+
+Build order decided (2026-04-21):
+
+1. **Perplexity trend research** — rewrite `/api/cron/research` to query Perplexity API for real-time niche trend data (what hooks/formats are performing in the editing niche this week). Store in `niche_trends`. Feeds into Claude at pipeline time. Needs `PERPLEXITY_API_KEY`.
+2. **Instagram performance feedback loop** — pull own post metrics via Graph API → store in `performance` table → Claude uses this to learn what works for your specific audience. Needs `INSTAGRAM_ACCESS_TOKEN` + `INSTAGRAM_BUSINESS_ACCOUNT_ID`.
+3. **Auto-repurpose top posts** — dashboard button to take your top 3 posts and have Claude rewrite them with fresh hooks as new content.
+
+**Why:** Captions are currently generic because Claude has no niche context. With Perplexity data + own Instagram performance, captions become trend-aware and audience-tuned.
+
+**Cost:** ~$0 added (Perplexity: fractions of a cent/month for 4 weekly calls).
 
 ---
 
 ## In Progress
 
-_Env var setup in progress. Social platform keys (Instagram, TikTok, X) still needed before posting works. Core pipeline (Drive → Whisper → Claude → review) is fully configured and ready to test._
+_Social platform keys (Instagram, TikTok, X) still needed before posting works. Pipeline fully tested end-to-end._
 
 ---
 
@@ -310,7 +415,8 @@ _Env var setup in progress. Social platform keys (Instagram, TikTok, X) still ne
 4. [x] **Plan 3** — Review PWA screens (Stitch designs → real UI: review, dashboard, settings)
 5. [x] **Plan 4** — Push notifications (VAPID, push_subscriptions table, subscribe route, pipeline trigger, bell button)
 6. [x] **Plan 5** — Research tab UI + weekly spy cron (YouTube, TikTok, Reddit trending content with Claude analysis)
-6. [x] **Plan 6** — Direct platform posting (Instagram Graph API, TikTok Content API, X API v2 — replaces Blotato)
-7. [ ] **Plan 7** — Metrics tab + daily performance pull + personal engagement loop
-8. [ ] Carousel generation via nano-banana (standalone)
-9. [ ] LinkedIn support (v2)
+7. [x] **Plan 6** — Direct platform posting (Instagram Graph API, TikTok Content API, X API v2 — replaces Blotato)
+8. [ ] **Plan 7** — Perplexity trend research + Instagram feedback loop + auto-repurpose (intelligence upgrade)
+9. [ ] **Plan 8** — Metrics tab + daily performance pull
+10. [ ] Carousel generation via nano-banana (standalone)
+11. [ ] LinkedIn support (v2)
