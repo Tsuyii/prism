@@ -172,12 +172,23 @@ export function ReviewClient({ post, variants, filmNext }: ReviewClientProps) {
       {/* Scrollable Content */}
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-5 pb-40">
 
-        {/* Video thumbnail placeholder */}
-        <div className="w-full aspect-video rounded-xl bg-zinc-800 flex items-center justify-center">
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-zinc-600">
-            <polygon points="5 3 19 12 5 21 5 3" />
-          </svg>
-        </div>
+        {/* Video preview */}
+        {post.drive_url ? (
+          <div className="w-full aspect-video rounded-xl overflow-hidden bg-zinc-800">
+            <iframe
+              src={post.drive_url.replace('/view', '/preview').split('?')[0]}
+              className="w-full h-full"
+              allow="autoplay"
+              allowFullScreen
+            />
+          </div>
+        ) : (
+          <div className="w-full aspect-video rounded-xl bg-zinc-800 flex items-center justify-center">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-zinc-600">
+              <polygon points="5 3 19 12 5 21 5 3" />
+            </svg>
+          </div>
+        )}
 
         {/* Caption */}
         <div>
