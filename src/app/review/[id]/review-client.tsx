@@ -170,7 +170,7 @@ export function ReviewClient({ post, variants, filmNext }: ReviewClientProps) {
       </div>
 
       {/* Scrollable Content */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-5 pb-40">
+      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-5 pb-24">
 
         {/* Video preview */}
         {post.drive_url ? (
@@ -279,24 +279,24 @@ export function ReviewClient({ post, variants, filmNext }: ReviewClientProps) {
             {error}
           </div>
         )}
-      </div>
 
-      {/* Sticky bottom CTAs */}
-      <div className="fixed bottom-0 left-0 right-0 px-4 py-4 pb-[env(safe-area-inset-bottom,16px)] bg-zinc-950/95 backdrop-blur-sm border-t border-zinc-800 space-y-3 md:absolute md:left-16">
-        <button
-          onClick={handleApprove}
-          disabled={loading !== null}
-          className="w-full flex items-center justify-center gap-2 py-4 rounded-xl bg-green-600 hover:bg-green-500 disabled:opacity-50 disabled:cursor-not-allowed font-semibold text-white transition-colors"
-        >
-          {loading === 'approve' ? <span className="animate-pulse">Processing...</span> : 'Approve'}
-        </button>
-        <button
-          onClick={handleReject}
-          disabled={loading !== null}
-          className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-zinc-300 transition-colors"
-        >
-          {loading === 'reject' ? <span className="animate-pulse">Processing...</span> : 'Reject'}
-        </button>
+        {/* CTAs — inline so they don't cover content */}
+        <div className="space-y-3 pt-2">
+          <button
+            onClick={handleApprove}
+            disabled={loading !== null}
+            className="w-full flex items-center justify-center gap-2 py-4 rounded-xl bg-green-600 hover:bg-green-500 disabled:opacity-50 disabled:cursor-not-allowed font-semibold text-white transition-colors"
+          >
+            {loading === 'approve' ? <span className="animate-pulse">Processing...</span> : 'Approve'}
+          </button>
+          <button
+            onClick={handleReject}
+            disabled={loading !== null}
+            className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-zinc-300 transition-colors"
+          >
+            {loading === 'reject' ? <span className="animate-pulse">Processing...</span> : 'Reject'}
+          </button>
+        </div>
       </div>
     </div>
   )
