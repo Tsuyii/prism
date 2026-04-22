@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { fetchYouTubeTrends, fetchRedditTrends, scoreTrendsWithClaude, TrendScoringSchema } from '../trends'
+import { fetchYouTubeTrends, fetchRedditTrends, fetchPerplexityTrends, scoreTrendsWithClaude, TrendScoringSchema } from '../trends'
 
 const mockFetch = vi.fn()
 vi.stubGlobal('fetch', mockFetch)
@@ -122,5 +122,66 @@ describe('TrendScoringSchema', () => {
       claude_topics: [],
     })
     expect(result.success).toBe(false)
+  })
+})
+
+describe('fetchPerplexityTrends', () => {
+  beforeEach(() => mockFetch.mockReset())
+
+  it('returns RawTrend array from Perplexity JSON response', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        choices: [
+          {
+            message: {
+              content: '["CapCut AI tools 2025", "speed ramp transitions", "colour grading presets"]',
+            },
+          },
+        ],
+      }),
+    })
+
+    const trends = await fetchPerplexityTrends('test-key')
+    expect(trends).toHaveLength(3)
+    expect(trends[0]).toMatchObject({
+      topic: 'CapCut AI tools 2025',
+      source: 'perplexity',
+      raw_data: { model: 'sonar' },
+    })
+  })
+
+  it('returns empty array on non-ok response', async () => {
+    mockFetch.mockResolvedValueOnce({ ok: false, status: 401 })
+    const trends = await fetchPerplexityTrends('bad-key')
+    expect(trends).toEqual([])
+  })
+
+  it('returns empty array when response content is not valid JSON', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        choices: [{ message: { content: 'Here are some trends: ...' } }],
+      }),
+    })
+    const trends = await fetchPerplexityTrends('test-key')
+    expect(trends).toEqual([])
+  })
+
+  it('strips markdown code fences before parsing JSON', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        choices: [
+          {
+            message: {
+              content: '```json\n["AI transitions", "viral hooks"]\n```',
+            },
+          },
+        ],
+      }),
+    })
+    const trends = await fetchPerplexityTrends('test-key')
+    expect(trends).toHaveLength(2)
   })
 })

@@ -6,14 +6,14 @@ import { z } from 'zod'
 
 export interface RawTrend {
   topic: string
-  source: 'youtube' | 'reddit'
+  source: 'youtube' | 'reddit' | 'perplexity'
   raw_data: Record<string, unknown>
 }
 
 export interface ScoredTrend {
   topic: string
   score: number
-  source: 'youtube' | 'reddit' | 'claude'
+  source: 'youtube' | 'reddit' | 'perplexity' | 'claude'
   raw_data: Record<string, unknown>
 }
 
@@ -24,7 +24,7 @@ export const TrendScoringSchema = z.object({
     z.object({
       topic: z.string(),
       score: z.number().min(0).max(100),
-      source: z.enum(['youtube', 'reddit']),
+      source: z.enum(['youtube', 'reddit', 'perplexity']),
     }),
   ),
   claude_topics: z.array(
@@ -108,6 +108,66 @@ export async function fetchRedditTrends(): Promise<RawTrend[]> {
   )
 
   return settled.flatMap((result) => (result.status === 'fulfilled' ? result.value : []))
+}
+
+// ─── Perplexity fetcher ───────────────────────────────────────────────────────
+
+export async function fetchPerplexityTrends(apiKey: string): Promise<RawTrend[]> {
+  let res: Response
+  try {
+    res = await fetch('https://api.perplexity.ai/chat/completions', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'sonar',
+        messages: [
+          {
+            role: 'system',
+            content:
+              'You are a trend researcher for the video editing niche. Respond ONLY with a valid JSON array of strings — no explanation, no markdown, no code block. Each string is a trending topic, hook, or video format.',
+          },
+          {
+            role: 'user',
+            content:
+              'What are the top 10 trending topics, hooks, and video formats in the CapCut, Premiere Pro, After Effects, and DaVinci Resolve editing niche right now this week? Return ONLY a JSON array of 10 strings.',
+          },
+        ],
+      }),
+    })
+  } catch (err) {
+    console.warn('[trends] Perplexity fetch error:', err)
+    return []
+  }
+
+  if (!res.ok) {
+    console.warn(`[trends] Perplexity API ${res.status}`)
+    return []
+  }
+
+  const data = await res.json()
+  const content: string = data.choices?.[0]?.message?.content ?? ''
+
+  let topics: unknown
+  try {
+    const cleaned = content.replace(/^```json\n?|^```\n?|\n?```$/gm, '').trim()
+    topics = JSON.parse(cleaned)
+  } catch {
+    console.warn('[trends] Perplexity response not valid JSON:', content.slice(0, 200))
+    return []
+  }
+
+  if (!Array.isArray(topics)) return []
+
+  return topics
+    .filter((t): t is string => typeof t === 'string')
+    .map((topic) => ({
+      topic,
+      source: 'perplexity' as const,
+      raw_data: { model: 'sonar' },
+    }))
 }
 
 // ─── Claude scorer ────────────────────────────────────────────────────────────

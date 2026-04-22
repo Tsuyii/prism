@@ -365,7 +365,7 @@ export const Constants = {
 export type PostStatus = 'pending_review' | 'approved' | 'rejected' | 'published' | 'failed'
 export type ContentType = 'reel' | 'carousel'
 export type Platform = 'instagram' | 'tiktok' | 'x_thread' | 'x_video'
-export type TrendSource = 'youtube' | 'reddit' | 'tiktok' | 'google_trends' | 'claude'
+export type TrendSource = 'youtube' | 'reddit' | 'tiktok' | 'google_trends' | 'claude' | 'perplexity'
 
 export type Post = Tables<'posts'>
 export type PostVariant = Tables<'post_variants'>
