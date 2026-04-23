@@ -44,7 +44,7 @@ export async function POST() {
 
     try {
       const newVariants = await generateRepurposedVariants({
-        contentType: post.type as 'reel' | 'carousel',
+        contentType: post.type === 'carousel' ? 'carousel' : 'reel',
         originalCaption: igVariant.caption,
         trendData: trends ?? [],
       })
@@ -60,7 +60,7 @@ export async function POST() {
         continue
       }
 
-      await supabase.from('post_variants').insert([
+      const { error: variantsError } = await supabase.from('post_variants').insert([
         {
           post_id: newPost.id,
           platform: 'instagram',
@@ -86,6 +86,12 @@ export async function POST() {
           hashtags: [],
         },
       ])
+
+      if (variantsError) {
+        console.error(`[repurpose] Failed to save variants for post ${newPost.id}:`, variantsError)
+        await supabase.from('posts').update({ status: 'failed' }).eq('id', newPost.id)
+        continue
+      }
 
       repurposed++
     } catch (err) {
