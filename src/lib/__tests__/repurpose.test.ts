@@ -1,7 +1,7 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-vi.mock('@anthropic-ai/sdk', () => {
-  const parseMock = vi.fn().mockResolvedValue({
+const { parseMock } = vi.hoisted(() => ({
+  parseMock: vi.fn().mockResolvedValue({
     parsed_output: {
       instagram: { caption: 'Fresh caption', hashtags: ['#edit'] },
       tiktok: { caption: 'Fresh TikTok', hashtags: ['#fyp'] },
@@ -11,7 +11,10 @@ vi.mock('@anthropic-ai/sdk', () => {
       film_next: 'Speed ramp tutorial',
     },
     stop_reason: 'end_turn',
-  })
+  }),
+}))
+
+vi.mock('@anthropic-ai/sdk', () => {
   class MockAnthropic {
     messages = { parse: parseMock }
   }
@@ -21,6 +24,8 @@ vi.mock('@anthropic-ai/sdk', () => {
 import { generateRepurposedVariants } from '../claude'
 
 describe('generateRepurposedVariants', () => {
+  beforeEach(() => vi.clearAllMocks())
+
   it('returns ContentVariants with all four platforms', async () => {
     const result = await generateRepurposedVariants({
       contentType: 'reel',
@@ -42,5 +47,15 @@ describe('generateRepurposedVariants', () => {
       originalCaption: 'Original carousel about colour grading',
     })
     expect(result.instagram.caption).toBeDefined()
+  })
+
+  it('throws when Claude returns no parsed output', async () => {
+    parseMock.mockResolvedValueOnce({
+      parsed_output: null,
+      stop_reason: 'max_tokens',
+    })
+    await expect(
+      generateRepurposedVariants({ contentType: 'reel', originalCaption: 'test' }),
+    ).rejects.toThrow('Claude returned no parsed output')
   })
 })
