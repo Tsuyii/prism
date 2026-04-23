@@ -4,6 +4,7 @@ import { postInstagram } from '@/lib/post-instagram'
 import { postX } from '@/lib/post-x'
 import { postTikTok } from '@/lib/post-tiktok'
 import type { PostVariant } from '@/lib/supabase/types'
+import { fetchInstagramMetrics } from '@/lib/instagram-metrics'
 
 type PlatformOutcome =
   | { status: 'success'; platform: string }
@@ -153,5 +154,36 @@ export async function GET(request: NextRequest) {
 
   const summary = { processed: posts.length, published, failed }
   console.log('[cron/post] Done', summary)
+
+  // ── Pull Instagram metrics (non-fatal) ──────────────────────────────────────
+  if (process.env.INSTAGRAM_ACCESS_TOKEN && process.env.INSTAGRAM_BUSINESS_ACCOUNT_ID) {
+    try {
+      const supabaseMetrics = createServiceClient()
+      const cutoff = new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString()
+      await supabaseMetrics.from('performance').delete().lt('fetched_at', cutoff)
+
+      const metrics = await fetchInstagramMetrics(
+        process.env.INSTAGRAM_ACCESS_TOKEN,
+        process.env.INSTAGRAM_BUSINESS_ACCOUNT_ID,
+      )
+      if (metrics.length > 0) {
+        const rows = metrics.map((m) => ({
+          platform: 'instagram',
+          post_id: null,
+          views: m.views,
+          likes: m.likes,
+          saves: m.saves,
+          shares: m.shares,
+          impressions: m.impressions,
+          reach: m.reach,
+        }))
+        await supabaseMetrics.from('performance').insert(rows)
+        console.log(`[cron/post] Inserted ${rows.length} performance rows`)
+      }
+    } catch (err) {
+      console.warn('[cron/post] Metrics pull failed (non-fatal):', err)
+    }
+  }
+
   return NextResponse.json(summary)
 }
