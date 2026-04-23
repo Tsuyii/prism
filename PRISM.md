@@ -229,7 +229,7 @@ After each task passes spec + code quality review, commit and push directly to m
 | Plan 4: Push Notifications | `docs/superpowers/plans/2026-04-19-plan-4-push-notifications.md` | Complete |
 | Plan 5: Research tab + spy cron | `docs/superpowers/plans/2026-04-19-plan-5-research-cron.md` | Complete |
 | Plan 6: Direct platform posting (replace Blotato) | `docs/superpowers/plans/2026-04-19-plan-6-direct-posting.md` | Complete |
-| Plan 7: Metrics tab + performance loop | TBD | Not written yet |
+| Plan 7: Intelligence Upgrade | `docs/superpowers/plans/2026-04-22-plan-7-intelligence-upgrade.md` | Complete |
 | Plan 8: UI Polish | TBD | Not written yet |
 
 ---
@@ -365,6 +365,16 @@ All screens live in Stitch project `12320735979743494453`. Tell Claude which to 
 | # | Screen ID | Style |
 |---|-----------|-------|
 | NP1 | `2c7f68a8c42e48a1a58e6a1c8224bace` | Base New Post Mobile |
+
+---
+
+## Session Progress (2026-04-21 — UI Design Session)
+
+### Stitch UI generation (2026-04-21)
+- Generated 41 new screen variants across all screens in Stitch project `12320735979743494453`
+- All variants catalogued in the **Design Variants** section above with screen IDs and style descriptions
+- Organised by category: Dashboard Desktop (14), Dashboard Mobile (10), Review Post Mobile (4), Settings Desktop (6), Settings Mobile (6), New Post Mobile (1)
+- **Next session:** Pick variants to implement — tell Claude which IDs (e.g. "D11, M4, SM5") and it will pull the HTML and build them out. Manually arrange on Stitch canvas if needed (MCP has no move tool).
 
 ---
 
