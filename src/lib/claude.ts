@@ -67,6 +67,12 @@ Identify the #1 gap between trending topics in the niche and what is underserved
 
 // ─── Input / prompt builder ───────────────────────────────────────────────────
 
+export interface RepurposeInput {
+  contentType: 'reel' | 'carousel'
+  originalCaption: string
+  trendData?: Array<Pick<NicheTrend, 'topic' | 'source'>>
+}
+
 export interface GenerateInput {
   contentType: 'reel' | 'carousel'
   filename: string
@@ -130,6 +136,52 @@ export async function generateContentVariants(
       },
     ],
     messages: [{ role: 'user', content: buildUserPrompt(input) }],
+    output_config: {
+      format: zodOutputFormat(ContentVariantsSchema),
+    },
+  })
+
+  if (!response.parsed_output) {
+    throw new Error(`Claude returned no parsed output. Stop reason: ${response.stop_reason}`)
+  }
+
+  return response.parsed_output
+}
+
+export async function generateRepurposedVariants(
+  input: RepurposeInput,
+): Promise<ContentVariants> {
+  const client = new Anthropic()
+
+  const sections: string[] = [
+    `## Top-performing content to repurpose`,
+    `- Type: ${input.contentType === 'reel' ? 'Short-form video (Reel)' : 'Carousel'}`,
+    `- Original caption: ${input.originalCaption}`,
+    ``,
+    `This was one of your best-performing posts. Generate fresh platform-native variants with NEW hooks — same topic, completely different angle and opening line. Do not reuse any phrases from the original caption.`,
+  ]
+
+  if (input.trendData && input.trendData.length > 0) {
+    const trends = input.trendData
+      .slice(0, 10)
+      .map((t) => `- ${t.topic} (${t.source})`)
+      .join('\n')
+    sections.push(`\n## Current trending topics in the niche\n${trends}`)
+  }
+
+  sections.push('\nGenerate all four platform variants plus timing and film-next recommendation.')
+
+  const response = await client.messages.parse({
+    model: 'claude-sonnet-4-6',
+    max_tokens: 4096,
+    system: [
+      {
+        type: 'text',
+        text: SYSTEM_PROMPT,
+        cache_control: { type: 'ephemeral' },
+      },
+    ],
+    messages: [{ role: 'user', content: sections.join('\n') }],
     output_config: {
       format: zodOutputFormat(ContentVariantsSchema),
     },
