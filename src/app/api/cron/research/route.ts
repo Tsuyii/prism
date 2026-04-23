@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/server'
-import { fetchYouTubeTrends, fetchRedditTrends, fetchPerplexityTrends, scoreTrendsWithClaude } from '@/lib/trends'
+import { fetchYouTubeTrends, fetchRedditTrends, fetchPerplexityTrends, scoreTrendsWithClaude, type RawTrend } from '@/lib/trends'
 import type { Json } from '@/lib/supabase/types'
 
 export async function GET(request: NextRequest) {
@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
   await supabase.from('niche_trends').delete().lt('fetched_at', cutoff).not('source', 'eq', 'claude')
 
   // ── Fetch raw trends in parallel ──────────────────────────────────────────
-  const fetchers: Promise<Awaited<ReturnType<typeof fetchYouTubeTrends>>>[] = [
+  const fetchers: Promise<RawTrend[]>[] = [
     fetchYouTubeTrends(youtubeKey),
     fetchRedditTrends(),
   ]
