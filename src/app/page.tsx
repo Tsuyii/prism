@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { PostCard } from '@/components/post-card'
 import { PushBell } from '@/components/push-bell'
+import { RepurposeButton } from '@/components/repurpose-button'
 import type { PostStatus } from '@/lib/supabase/types'
 
 export const revalidate = 0
@@ -58,6 +59,7 @@ export default async function DashboardPage() {
         <h1 className="text-xl font-bold">Dashboard</h1>
         <div className="flex items-center gap-2">
           <PushBell />
+          <RepurposeButton />
           <Link
             href="/new"
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-violet-600 hover:bg-violet-500 transition-colors text-sm font-medium text-white"
