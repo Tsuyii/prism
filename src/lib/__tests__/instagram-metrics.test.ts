@@ -85,4 +85,10 @@ describe('fetchInstagramMetrics', () => {
     const rows = await fetchInstagramMetrics('token123', 'account456')
     expect(rows).toEqual([])
   })
+
+  it('returns empty array on network error during media fetch', async () => {
+    mockFetch.mockRejectedValueOnce(new Error('network failure'))
+    const rows = await fetchInstagramMetrics('token123', 'account456')
+    expect(rows).toEqual([])
+  })
 })

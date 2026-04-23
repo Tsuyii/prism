@@ -36,7 +36,13 @@ export async function fetchInstagramMetrics(
   mediaUrl.searchParams.set('limit', '10')
   mediaUrl.searchParams.set('access_token', accessToken)
 
-  const mediaRes = await fetch(mediaUrl.toString())
+  let mediaRes: Response
+  try {
+    mediaRes = await fetch(mediaUrl.toString())
+  } catch (err) {
+    console.warn('[instagram-metrics] media fetch error:', err)
+    return []
+  }
   if (!mediaRes.ok) {
     console.warn(`[instagram-metrics] media fetch ${mediaRes.status}`)
     return []
