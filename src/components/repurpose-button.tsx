@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { RefreshCw, CheckCircle2, AlertCircle } from 'lucide-react'
 
 type State = 'idle' | 'loading' | 'done' | 'error'
 
@@ -31,38 +32,22 @@ export function RepurposeButton() {
     }
   }
 
-  const label =
-    state === 'loading' ? 'Working…'
-    : state === 'done' ? `${count} post${count !== 1 ? 's' : ''} queued`
-    : state === 'error' ? 'Failed — try again'
-    : 'Repurpose Top'
-
-  const textColor =
-    state === 'done' ? 'text-violet-300'
-    : state === 'error' ? 'text-red-400'
-    : 'text-zinc-300'
+  const config = {
+    idle: { label: 'Repurpose', icon: null, className: 'text-text-secondary hover:text-text-primary' },
+    loading: { label: 'Working...', icon: <RefreshCw size={13} className="animate-spin" />, className: 'text-text-muted' },
+    done: { label: `${count} queued`, icon: <CheckCircle2 size={13} />, className: 'text-accent-400' },
+    error: { label: 'Failed', icon: <AlertCircle size={13} />, className: 'text-red-400' },
+  }[state]
 
   return (
     <button
       onClick={handleClick}
       disabled={state === 'loading'}
       aria-label="Repurpose top posts"
-      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 transition-colors text-sm font-medium disabled:opacity-50 ${textColor}`}
+      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-medium transition-all duration-200 disabled:opacity-50 bg-surface-3 hover:bg-surface-4 border border-border-default ${config.className}`}
     >
-      {state === 'loading' && (
-        <svg
-          className="animate-spin"
-          width="12"
-          height="12"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2.5"
-        >
-          <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-        </svg>
-      )}
-      {label}
+      {config.icon}
+      {config.label}
     </button>
   )
 }

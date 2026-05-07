@@ -26,7 +26,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={`${geist.className} flex flex-col min-h-screen bg-zinc-950 text-white md:flex-row`}>
+      <body className={`${geist.className} flex flex-col min-h-screen bg-surface-0 text-text-primary md:flex-row antialiased`}>
         <Nav />
         <main className="flex-1 overflow-y-auto pb-20 md:pb-0">
           {children}

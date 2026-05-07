@@ -1,43 +1,38 @@
+import { Sparkles, TrendingUp, ExternalLink } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
+import { GlassCard, SectionHeading, EmptyState, Badge } from '@/components/ui/primitives'
 import type { NicheTrend } from '@/lib/supabase/types'
 
 export const revalidate = 0
 
-const SOURCE_LABEL: Record<string, string> = {
-  youtube: 'YouTube',
-  reddit: 'Reddit',
-  claude: 'AI Pick',
-  tiktok: 'TikTok',
-  google_trends: 'Google',
-}
-
-const SOURCE_COLOR: Record<string, string> = {
-  youtube: 'bg-red-950 text-red-400 border-red-900',
-  reddit: 'bg-orange-950 text-orange-400 border-orange-900',
-  claude: 'bg-violet-950 text-violet-400 border-violet-900',
-  tiktok: 'bg-sky-950 text-sky-400 border-sky-900',
-  google_trends: 'bg-blue-950 text-blue-400 border-blue-900',
+const SOURCE_CONFIG: Record<string, { label: string; variant: 'accent' | 'danger' | 'warning' | 'default' }> = {
+  youtube: { label: 'YouTube', variant: 'danger' },
+  reddit: { label: 'Reddit', variant: 'warning' },
+  claude: { label: 'AI Pick', variant: 'accent' },
+  tiktok: { label: 'TikTok', variant: 'default' },
+  google_trends: { label: 'Google', variant: 'default' },
+  perplexity: { label: 'Perplexity', variant: 'accent' },
 }
 
 function ScoreBadge({ score }: { score: number | null }) {
   if (score === null) return null
-  const color =
-    score >= 80 ? 'text-green-400' : score >= 50 ? 'text-yellow-400' : 'text-zinc-500'
-  return <span className={`text-sm font-bold tabular-nums ${color}`}>{score}</span>
+  const color = score >= 80 ? 'text-green-400' : score >= 50 ? 'text-yellow-400' : 'text-text-muted'
+  return (
+    <span className={`text-sm font-bold tabular-nums ${color}`}>
+      {score}
+    </span>
+  )
 }
 
 function TrendCard({ trend }: { trend: NicheTrend }) {
-  const sourceLabel = SOURCE_LABEL[trend.source] ?? trend.source
-  const sourceColor = SOURCE_COLOR[trend.source] ?? 'bg-zinc-900 text-zinc-400 border-zinc-800'
+  const config = SOURCE_CONFIG[trend.source] ?? { label: trend.source, variant: 'default' as const }
 
   return (
-    <div className="rounded-xl bg-zinc-900 border border-zinc-800 px-4 py-3 flex items-start gap-3">
+    <div className="flex items-start gap-3 py-3 border-b border-border-subtle last:border-0 animate-fade-in">
       <div className="flex-1 min-w-0">
-        <p className="text-sm text-white leading-snug">{trend.topic}</p>
+        <p className="text-sm text-text-primary leading-snug">{trend.topic}</p>
         <div className="flex items-center gap-2 mt-1.5">
-          <span className={`text-xs px-2 py-0.5 rounded-full border font-medium ${sourceColor}`}>
-            {sourceLabel}
-          </span>
+          <Badge variant={config.variant} size="sm">{config.label}</Badge>
         </div>
       </div>
       <ScoreBadge score={trend.score} />
@@ -57,59 +52,73 @@ export default async function ResearchPage() {
 
   const all = trends ?? []
   const lastFetched = all[0]?.fetched_at
-    ? new Date(all[0].fetched_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+    ? new Date(all[0].fetched_at).toLocaleDateString('en-US', {
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric',
+      })
     : null
 
   const aiPicks = all.filter((t) => t.source === 'claude')
   const external = all.filter((t) => t.source !== 'claude')
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-6 space-y-8">
+    <div className="max-w-3xl mx-auto px-4 py-6 md:py-8 space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <header className="flex items-center justify-between animate-fade-in">
         <div>
-          <h1 className="text-xl font-bold">Research</h1>
+          <h1 className="text-xl font-bold text-text-primary">Research</h1>
           {lastFetched && (
-            <p className="text-xs text-zinc-500 mt-0.5">Updated {lastFetched}</p>
+            <p className="text-xs text-text-muted mt-0.5">Updated {lastFetched}</p>
           )}
         </div>
-      </div>
+        {all.length > 0 && (
+          <span className="text-xs text-text-muted tabular-nums">{all.length} topics</span>
+        )}
+      </header>
 
       {/* Empty state */}
       {all.length === 0 && (
-        <div className="text-center py-16 space-y-2">
-          <p className="text-zinc-500 text-sm">No trend data yet.</p>
-          <p className="text-zinc-600 text-xs">The weekly cron runs every Monday at 9:00 AM UTC.</p>
-        </div>
+        <EmptyState
+          icon={<TrendingUp size={24} />}
+          title="No trend data yet"
+          description="Weekly research cron runs every Monday at 9:00 AM UTC. Trends from YouTube, Reddit, Perplexity, and Claude AI will appear here."
+        />
       )}
 
       {/* AI Picks */}
       {aiPicks.length > 0 && (
-        <section>
-          <h2 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-3">
-            AI Picks — Emerging Gaps
-          </h2>
-          <div className="space-y-2">
-            {aiPicks.map((trend) => (
-              <TrendCard key={trend.id} trend={trend} />
-            ))}
-          </div>
+        <section className="animate-fade-in-up">
+          <SectionHeading>AI Picks — Emerging Gaps</SectionHeading>
+          <GlassCard glow className="divide-y divide-border-subtle !p-0">
+            <div className="px-4">
+              {aiPicks.map((trend) => (
+                <TrendCard key={trend.id} trend={trend} />
+              ))}
+            </div>
+          </GlassCard>
         </section>
       )}
 
       {/* External trends */}
       {external.length > 0 && (
-        <section>
-          <h2 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-3">
-            Trending Now
-          </h2>
-          <div className="space-y-2">
-            {external.map((trend) => (
-              <TrendCard key={trend.id} trend={trend} />
-            ))}
-          </div>
+        <section className="animate-fade-in-up">
+          <SectionHeading>Trending Now</SectionHeading>
+          <GlassCard className="divide-y divide-border-subtle !p-0">
+            <div className="px-4">
+              {external.map((trend) => (
+                <TrendCard key={trend.id} trend={trend} />
+              ))}
+            </div>
+          </GlassCard>
         </section>
       )}
+
+      {/* Footer info */}
+      <div className="flex items-center gap-2 text-xs text-text-muted animate-fade-in-up">
+        <ExternalLink size={12} />
+        Sourced from YouTube, Reddit, Perplexity, and Claude analysis. Refreshed weekly.
+      </div>
     </div>
   )
 }

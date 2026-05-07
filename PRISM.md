@@ -230,11 +230,39 @@ After each task passes spec + code quality review, commit and push directly to m
 | Plan 5: Research tab + spy cron | `docs/superpowers/plans/2026-04-19-plan-5-research-cron.md` | Complete |
 | Plan 6: Direct platform posting (replace Blotato) | `docs/superpowers/plans/2026-04-19-plan-6-direct-posting.md` | Complete |
 | Plan 7: Intelligence Upgrade | `docs/superpowers/plans/2026-04-22-plan-7-intelligence-upgrade.md` | Complete |
-| Plan 8: UI Polish | TBD | Not written yet |
+| Plan 8: UI Polish | `docs/superpowers/plans/2026-05-07-plan-8-ui-polish.md` | Complete |
 
 ---
 
 ## Completed Features
+
+### Plan 8: UI Polish (2026-05-07)
+- [x] Design system: semantic CSS tokens (surface, accent, border, text), glassmorphism utilities, animation keyframes, focus rings, reduced-motion support
+- [x] Lucide icons (`lucide-react`) replace all inline SVGs — consistent stroke, size, and style
+- [x] `src/components/ui/primitives.tsx` — GlassCard, Button, Badge, SectionHeading, EmptyState, Skeleton
+- [x] `src/components/nav.tsx` — rebuilt with Lucide icons, glass backdrop blur, desktop logo with violet gradient, version badge
+- [x] `src/components/post-card.tsx` — glass card styling, Lucide Film/Image icons, semantic status badges
+- [x] `src/components/push-bell.tsx` — Lucide Bell/BellRing/Loader2 icons
+- [x] `src/components/repurpose-button.tsx` — Lucide RefreshCw/CheckCircle2/AlertCircle icons
+- [x] `src/app/page.tsx` (Dashboard) — D2 Command Center: 3-panel desktop with Pipeline Health sidebar, animated stat cards with gradient backgrounds, glass cards, Quick Links, Platform Status indicator
+- [x] `src/app/review/[id]/review-client.tsx` (Review) — R2 Atmospheric Immersion: violet nebula background blurs, glass-strong header, floating CTA bar, polished tabs, glass card for film-next tip
+- [x] `src/app/settings/settings-client.tsx` (Settings) — SD5 Bento Box: 4-column bento grid desktop, summary sidebar, Film/Image/Power type pills, neon-minimalist rows
+- [x] `src/app/new/page.tsx` (New Post) — NP1: clipboard paste button, content type selector with icons, glass info card
+- [x] `src/app/research/page.tsx` (Research) — Glass cards, Perplexity source badge, score badges, updated date, empty state
+- [x] `src/app/layout.tsx` — updated to use design tokens (bg-surface-0, text-text-primary, antialiased)
+- [x] `src/app/globals.css` — complete design system rewrite (see above)
+- [x] 115 tests passing, production build verified — all pages return 200
+- [x] Design variants applied: D2 (Command Center), M4 (Cinematic Spotlight), R2 (Atmospheric Immersion), SD5 (Bento Box), SM5 (Neon-Minimalist), NP1
+
+### Plan 7: Intelligence Upgrade (2026-04-23)
+- [x] Perplexity sonar API integrated into weekly research cron — non-fatal if `PERPLEXITY_API_KEY` absent
+- [x] `TrendSource` extended with `'perplexity'` in `src/lib/supabase/types.ts`
+- [x] `fetchInstagramMetrics()` in `src/lib/instagram-metrics.ts` — pulls plays/reach/impressions/saves/shares for 10 recent posts
+- [x] Instagram metrics pull merged into daily post cron (non-fatal, guarded by env var presence)
+- [x] `generateRepurposedVariants()` added to `src/lib/claude.ts` — repurposes top posts with fresh hooks
+- [x] `POST /api/repurpose` — fetches top 3 published posts, calls Claude, creates new `pending_review` posts
+- [x] "Repurpose Top" button on dashboard header (`src/components/repurpose-button.tsx`)
+- [x] 115 tests passing
 
 ### Plan 4: Push Notifications (2026-04-19)
 - [x] `web-push` v3.6.7 installed, VAPID keys generated
@@ -397,23 +425,9 @@ All screens live in Stitch project `12320735979743494453`. Tell Claude which to 
 
 ---
 
-## Next Session — Intelligence Upgrade
-
-Build order decided (2026-04-21):
-
-1. **Perplexity trend research** — rewrite `/api/cron/research` to query Perplexity API for real-time niche trend data (what hooks/formats are performing in the editing niche this week). Store in `niche_trends`. Feeds into Claude at pipeline time. Needs `PERPLEXITY_API_KEY`.
-2. **Instagram performance feedback loop** — pull own post metrics via Graph API → store in `performance` table → Claude uses this to learn what works for your specific audience. Needs `INSTAGRAM_ACCESS_TOKEN` + `INSTAGRAM_BUSINESS_ACCOUNT_ID`.
-3. **Auto-repurpose top posts** — dashboard button to take your top 3 posts and have Claude rewrite them with fresh hooks as new content.
-
-**Why:** Captions are currently generic because Claude has no niche context. With Perplexity data + own Instagram performance, captions become trend-aware and audience-tuned.
-
-**Cost:** ~$0 added (Perplexity: fractions of a cent/month for 4 weekly calls).
-
----
-
 ## In Progress
 
-_Social platform keys (Instagram, TikTok, X) still needed before posting works. Pipeline fully tested end-to-end._
+_All 8 plans complete. Social platform keys (Instagram, TikTok, X) still needed before posting works. Pipeline fully tested end-to-end._
 
 ---
 
@@ -426,7 +440,7 @@ _Social platform keys (Instagram, TikTok, X) still needed before posting works. 
 5. [x] **Plan 4** — Push notifications (VAPID, push_subscriptions table, subscribe route, pipeline trigger, bell button)
 6. [x] **Plan 5** — Research tab UI + weekly spy cron (YouTube, TikTok, Reddit trending content with Claude analysis)
 7. [x] **Plan 6** — Direct platform posting (Instagram Graph API, TikTok Content API, X API v2 — replaces Blotato)
-8. [ ] **Plan 7** — Perplexity trend research + Instagram feedback loop + auto-repurpose (intelligence upgrade)
-9. [ ] **Plan 8** — Metrics tab + daily performance pull
+8. [x] **Plan 7** — Perplexity trend research + Instagram feedback loop + auto-repurpose (intelligence upgrade)
+9. [x] **Plan 8** — UI Polish (2026-05-07)
 10. [ ] Carousel generation via nano-banana (standalone)
 11. [ ] LinkedIn support (v2)

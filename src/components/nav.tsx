@@ -3,81 +3,74 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
+import {
+  LayoutDashboard,
+  PlusCircle,
+  Search,
+  Settings,
+  Sparkles,
+} from 'lucide-react'
 
 const NAV_ITEMS = [
-  {
-    href: '/',
-    label: 'Dashboard',
-    icon: (active: boolean) => (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={active ? 2.5 : 2} strokeLinecap="round" strokeLinejoin="round">
-        <rect x="3" y="3" width="7" height="7" />
-        <rect x="14" y="3" width="7" height="7" />
-        <rect x="14" y="14" width="7" height="7" />
-        <rect x="3" y="14" width="7" height="7" />
-      </svg>
-    ),
-  },
-  {
-    href: '/new',
-    label: 'New Post',
-    icon: (active: boolean) => (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={active ? 2.5 : 2} strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="12" r="10" />
-        <line x1="12" y1="8" x2="12" y2="16" />
-        <line x1="8" y1="12" x2="16" y2="12" />
-      </svg>
-    ),
-  },
-  {
-    href: '/research',
-    label: 'Research',
-    icon: (active: boolean) => (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={active ? 2.5 : 2} strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="11" cy="11" r="8" />
-        <line x1="21" y1="21" x2="16.65" y2="16.65" />
-      </svg>
-    ),
-  },
-  {
-    href: '/settings',
-    label: 'Settings',
-    icon: (active: boolean) => (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={active ? 2.5 : 2} strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="12" r="3" />
-        <path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14" />
-        <path d="M12 2v2M12 20v2M2 12h2M20 12h2" />
-      </svg>
-    ),
-  },
+  { href: '/', label: 'Dashboard', Icon: LayoutDashboard },
+  { href: '/new', label: 'New Post', Icon: PlusCircle },
+  { href: '/research', label: 'Research', Icon: Search },
+  { href: '/settings', label: 'Settings', Icon: Settings },
 ]
 
 export function Nav() {
   const pathname = usePathname()
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-zinc-800 bg-zinc-950 pb-[env(safe-area-inset-bottom,0px)] md:relative md:bottom-auto md:left-auto md:right-auto md:border-t-0 md:border-r md:min-h-screen md:w-16 md:pb-0">
-      <ul className="flex h-16 items-center justify-around md:flex-col md:h-auto md:justify-start md:gap-2 md:pt-4">
-        {NAV_ITEMS.map(({ href, label, icon }) => {
+    <nav
+      className="fixed bottom-0 left-0 right-0 z-50 border-t border-border-default bg-surface-0/90 backdrop-blur-xl pb-[env(safe-area-inset-bottom,0px)] md:relative md:bottom-auto md:left-auto md:right-auto md:border-t-0 md:border-r md:min-h-screen md:w-16 md:pb-0"
+      role="navigation"
+      aria-label="Main navigation"
+    >
+      {/* Logo — desktop only */}
+      <Link
+        href="/"
+        className="hidden md:flex items-center justify-center h-14 border-b border-border-default mx-2"
+        aria-label="Prism home"
+      >
+        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-accent-500 to-accent-700 flex items-center justify-center shadow-glow-sm">
+          <Sparkles size={18} className="text-white" strokeWidth={2.5} />
+        </div>
+      </Link>
+
+      <ul className="flex h-16 items-center justify-around md:flex-col md:h-auto md:justify-start md:gap-1 md:pt-3">
+        {NAV_ITEMS.map(({ href, label, Icon }) => {
           const active = pathname === href
           return (
             <li key={href}>
               <Link
                 href={href}
                 className={cn(
-                  'flex flex-col items-center gap-1 px-4 py-2 text-xs transition-colors md:px-3 md:py-3 md:rounded-lg md:mx-1',
+                  'flex flex-col items-center gap-1 px-4 py-2 text-[11px] font-medium transition-all duration-200 md:px-2 md:py-3 md:rounded-xl md:mx-1.5 md:gap-1.5',
                   active
-                    ? 'text-violet-400'
-                    : 'text-zinc-500 hover:text-zinc-300',
+                    ? 'text-accent-400 md:bg-surface-3'
+                    : 'text-text-muted hover:text-text-secondary md:hover:bg-surface-2',
                 )}
                 aria-current={active ? 'page' : undefined}
               >
-                {icon(active)}
+                <Icon
+                  size={22}
+                  strokeWidth={active ? 2.5 : 2}
+                  className="transition-all duration-200"
+                />
                 <span className="leading-none">{label}</span>
               </Link>
             </li>
           )
         })}
       </ul>
+
+      {/* Version — desktop only */}
+      <div className="hidden md:flex flex-1 items-end justify-center pb-4">
+        <span className="text-[10px] text-text-muted/40 font-mono rotate-180" style={{ writingMode: 'vertical-rl' }}>
+          v0.4
+        </span>
+      </div>
     </nav>
   )
 }

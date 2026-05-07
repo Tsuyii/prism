@@ -2,13 +2,13 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { Upload, Film, Image, ClipboardPaste, CheckCircle2, ArrowRight, Sparkles } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { Button, GlassCard } from '@/components/ui/primitives'
 
 function extractFileId(input: string): string {
-  // Handle full Drive URLs like https://drive.google.com/file/d/<ID>/view
   const match = input.match(/\/d\/([a-zA-Z0-9_-]+)/)
   if (match) return match[1]
-  // Assume raw fileId if no URL pattern
   return input.trim()
 }
 
@@ -32,7 +32,6 @@ export default function NewPostPage() {
     setStatus('loading')
     setError('')
 
-    const mimeType = contentType === 'reel' ? 'video/mp4' : 'image/jpeg'
     const name = fileName.trim() || `${contentType}-${Date.now()}.${contentType === 'reel' ? 'mp4' : 'jpg'}`
     const driveUrl = driveInput.startsWith('http')
       ? driveInput
@@ -45,7 +44,7 @@ export default function NewPostPage() {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${process.env.NEXT_PUBLIC_PIPELINE_SECRET ?? ''}`,
         },
-        body: JSON.stringify({ fileId, fileName: name, mimeType, driveUrl }),
+        body: JSON.stringify({ fileId, fileName: name, mimeType: contentType === 'reel' ? 'video/mp4' : 'image/jpeg', driveUrl }),
       })
 
       const data = await res.json().catch(() => ({}))
@@ -61,39 +60,52 @@ export default function NewPostPage() {
 
   if (status === 'success') {
     return (
-      <div className="max-w-sm mx-auto px-4 py-16 flex flex-col items-center gap-4 text-center">
-        <div className="w-14 h-14 rounded-full bg-green-600/20 flex items-center justify-center">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-green-400">
-            <polyline points="20 6 9 17 4 12" />
-          </svg>
+      <div className="max-w-sm mx-auto px-4 py-20 flex flex-col items-center gap-5 text-center animate-scale-in">
+        <div className="w-16 h-16 rounded-2xl bg-success-bg border border-success-border flex items-center justify-center">
+          <CheckCircle2 size={32} className="text-success" strokeWidth={2.5} />
         </div>
-        <h2 className="text-lg font-semibold">Pipeline started!</h2>
-        <p className="text-sm text-zinc-500">Claude is generating your content. Check back in a minute.</p>
-        <button
-          onClick={() => router.push(`/review/${postId}`)}
-          className="mt-2 px-5 py-2.5 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-medium transition-colors text-sm"
-        >
-          Review when ready →
-        </button>
-        <button
-          onClick={() => { setStatus('idle'); setDriveInput(''); setFileName('') }}
-          className="text-sm text-zinc-600 hover:text-zinc-400 transition-colors"
-        >
-          Submit another
-        </button>
+        <div>
+          <h2 className="text-lg font-bold text-text-primary">Pipeline started</h2>
+          <p className="text-sm text-text-muted mt-1.5 leading-relaxed">
+            Claude is generating your content across Instagram, TikTok, and X. Check back in about a minute.
+          </p>
+        </div>
+        <div className="flex flex-col gap-2 w-full">
+          <Button
+            variant="primary"
+            size="lg"
+            onClick={() => router.push(`/review/${postId}`)}
+          >
+            <ArrowRight size={17} strokeWidth={2.5} />
+            Review when ready
+          </Button>
+          <Button
+            variant="ghost"
+            onClick={() => { setStatus('idle'); setDriveInput(''); setFileName('') }}
+          >
+            Submit another
+          </Button>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="max-w-sm mx-auto px-4 py-6 space-y-6">
-      <h1 className="text-xl font-bold">New Post</h1>
+    <div className="max-w-sm mx-auto px-4 py-6 md:py-8 space-y-6">
+      {/* Header */}
+      <header className="animate-fade-in">
+        <h1 className="text-xl font-bold text-text-primary">New Post</h1>
+        <p className="text-sm text-text-muted mt-1">
+          Paste a Google Drive link to trigger the AI pipeline
+        </p>
+      </header>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Drive input */}
-        <div>
-          <label className="block text-xs font-medium text-zinc-400 uppercase tracking-wider mb-2">
-            Google Drive URL or File ID
+      <form onSubmit={handleSubmit} className="space-y-5 animate-fade-in-up">
+        {/* Drive URL */}
+        <div className="space-y-2">
+          <label className="flex items-center gap-1.5 text-xs font-semibold text-text-muted uppercase tracking-wider">
+            <Upload size={12} />
+            Drive URL or File ID
           </label>
           <div className="relative">
             <input
@@ -101,7 +113,7 @@ export default function NewPostPage() {
               value={driveInput}
               onChange={(e) => { setDriveInput(e.target.value); setError('') }}
               placeholder="https://drive.google.com/file/d/..."
-              className="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-violet-500 transition-colors pr-10"
+              className="w-full bg-surface-2 border border-border-default rounded-xl px-4 py-3.5 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent-500 transition-colors pr-11"
               required
             />
             <button
@@ -110,51 +122,53 @@ export default function NewPostPage() {
                 try {
                   const text = await navigator.clipboard.readText()
                   setDriveInput(text)
-                } catch { /* permission denied */ }
+                } catch { /* clipboard denied */ }
               }}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-600 hover:text-zinc-400 transition-colors"
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-text-muted hover:text-text-secondary hover:bg-surface-4 transition-all"
               title="Paste from clipboard"
+              aria-label="Paste from clipboard"
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
-                <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
-              </svg>
+              <ClipboardPaste size={16} strokeWidth={2} />
             </button>
           </div>
         </div>
 
-        {/* Filename (optional) */}
-        <div>
-          <label className="block text-xs font-medium text-zinc-400 uppercase tracking-wider mb-2">
-            Filename <span className="text-zinc-600 normal-case">(optional)</span>
+        {/* Filename */}
+        <div className="space-y-2">
+          <label className="text-xs font-semibold text-text-muted uppercase tracking-wider">
+            Filename <span className="text-text-muted/50 normal-case font-normal">(optional)</span>
           </label>
           <input
             type="text"
             value={fileName}
             onChange={(e) => setFileName(e.target.value)}
             placeholder="my-video.mp4"
-            className="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-violet-500 transition-colors"
+            className="w-full bg-surface-2 border border-border-default rounded-xl px-4 py-3 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent-500 transition-colors"
           />
         </div>
 
         {/* Content type */}
-        <div>
-          <label className="block text-xs font-medium text-zinc-400 uppercase tracking-wider mb-2">
+        <div className="space-y-2">
+          <label className="text-xs font-semibold text-text-muted uppercase tracking-wider">
             Content Type
           </label>
           <div className="flex gap-2">
-            {(['reel', 'carousel'] as const).map((type) => (
+            {([
+              { type: 'reel', Icon: Film },
+              { type: 'carousel', Icon: Image },
+            ] as const).map(({ type, Icon }) => (
               <button
                 key={type}
                 type="button"
                 onClick={() => setContentType(type)}
                 className={cn(
-                  'flex-1 py-2.5 rounded-xl text-sm font-medium transition-colors capitalize',
+                  'flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold capitalize transition-all duration-200',
                   contentType === type
-                    ? 'bg-violet-600 text-white'
-                    : 'bg-zinc-900 border border-zinc-700 text-zinc-400 hover:text-zinc-200',
+                    ? 'bg-accent-600 text-white shadow-glow-sm'
+                    : 'bg-surface-3 border border-border-default text-text-muted hover:text-text-secondary hover:border-border-accent',
                 )}
               >
+                <Icon size={16} strokeWidth={2.5} />
                 {type}
               </button>
             ))}
@@ -163,27 +177,30 @@ export default function NewPostPage() {
 
         {/* Error */}
         {(status === 'error' || error) && (
-          <div className="rounded-lg bg-red-950/50 border border-red-800/50 px-4 py-3 text-sm text-red-400">
+          <div className="rounded-xl bg-danger-bg border border-danger-border px-4 py-3 text-sm text-danger animate-fade-in">
             {error || 'Something went wrong. Try again.'}
           </div>
         )}
 
-        <button
+        {/* Submit */}
+        <Button
           type="submit"
-          disabled={status === 'loading'}
-          className="w-full py-4 rounded-xl bg-violet-600 hover:bg-violet-500 disabled:opacity-50 disabled:cursor-not-allowed font-semibold text-white transition-colors mt-2"
+          variant="primary"
+          size="lg"
+          loading={status === 'loading'}
+          className="!py-4"
         >
-          {status === 'loading' ? (
-            <span className="animate-pulse">Starting pipeline...</span>
-          ) : (
-            'Start Pipeline'
-          )}
-        </button>
+          <Sparkles size={17} strokeWidth={2.5} />
+          {status === 'loading' ? 'Starting pipeline...' : 'Start Pipeline'}
+        </Button>
       </form>
 
-      <p className="text-xs text-zinc-600 text-center leading-relaxed">
-        The file must be in your Google Drive folder. Claude will transcribe, generate captions, and queue it for your review.
-      </p>
+      {/* Info */}
+      <GlassCard className="!p-4 animate-fade-in-up">
+        <p className="text-xs text-text-muted leading-relaxed">
+          File must be in your Google Drive folder. Claude transcribes, generates platform-native captions, and queues everything for your review.
+        </p>
+      </GlassCard>
     </div>
   )
 }
